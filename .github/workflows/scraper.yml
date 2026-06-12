@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: scraper-pipeline
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   scrape:
@@ -24,6 +24,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -47,16 +50,31 @@ jobs:
         run: python main.py --once
 
       - name: Commit and push updated data
+        env:
+          BRANCH: ${{ github.ref_name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
           if git diff --staged --quiet; then
             echo "No data changes to commit"
-          else
-            git commit -m "chore: update rate data [skip ci]"
-            git push
+            exit 0
           fi
+
+          git commit -m "chore: update rate data [skip ci]"
+
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin "$BRANCH"
+            if git push origin "HEAD:$BRANCH"; then
+              echo "Push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "Push failed on attempt $attempt, retrying..."
+            sleep $((attempt * 3))
+          done
+
+          echo "Failed to push after 5 attempts"
+          exit 1
 
       - name: Upload data artifact for Pages
         uses: actions/upload-artifact@v4
