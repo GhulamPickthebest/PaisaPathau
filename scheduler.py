@@ -6,6 +6,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from alerting import alert_on_high_failure_rate
+from cleanup import cleanup_old_snapshots
 from config import settings
 from models import PipelineResult, RateRecord
 from output import write_all_outputs
@@ -116,6 +117,7 @@ def run_fetch_cycle(
 
     insert_rates(all_records)
     write_all_outputs(result, amount)
+    cleanup_old_snapshots()
 
     total_attempts = len(all_records)
     alert_on_high_failure_rate(

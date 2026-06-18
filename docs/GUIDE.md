@@ -95,7 +95,7 @@ All written to `data/` after each run:
 | File | Purpose |
 |------|---------|
 | `latest_rates.json` | Live rates for WordPress |
-| `rates_YYYYMMDD_HHMM.json` | Timestamped snapshot |
+| `rates_YYYYMMDD_HHMM.json` | Timestamped snapshot (auto-deleted after 3 days) |
 | `latest_rates.csv` | Flat export |
 | `rates_history.db` | SQLite trend history |
 

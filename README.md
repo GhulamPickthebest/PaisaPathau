@@ -67,6 +67,8 @@ After each cycle, files are written to `data/`:
 | `latest_rates.csv` | Flat CSV for WordPress / Google Sheets |
 | `rates_history.db` | SQLite historical data |
 
+Snapshots older than **3 days** are deleted automatically after each run. `latest_rates.json` is always kept.
+
 ### JSON API Endpoint
 
 Configure GitHub Pages to serve the `/data` folder. Your WordPress frontend fetches:
