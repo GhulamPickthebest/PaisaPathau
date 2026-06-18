@@ -1,128 +1,128 @@
 provider,customer_type,rate_label,from_currency,from_country,from_flag,to_currency,send_amount,exchange_rate,fee,net_send_amount,receive_amount,transfer_speed,delivery_method,timestamp,source,status
-Wise,,,AUD,Australia,🇦🇺,NPR,1000.0,106.238,0.0,1000.0,106238.0,1-2 business days,Bank transfer,2026-06-18T00:49:33+00:00,api,ok
-Wise,,,USD,United States,🇺🇸,NPR,1000.0,151.25,0.0,1000.0,151250.0,1-2 business days,Bank transfer,2026-06-18T00:49:33+00:00,api,ok
-Wise,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.261,0.0,1000.0,201261.0,1-2 business days,Bank transfer,2026-06-18T00:49:34+00:00,api,ok
-Wise,,,CAD,Canada,🇨🇦,NPR,1000.0,107.27,0.0,1000.0,107270.0,1-2 business days,Bank transfer,2026-06-18T00:49:34+00:00,api,ok
-Wise,,,NZD,New Zealand,🇳🇿,NPR,1000.0,87.4376,0.0,1000.0,87437.6,1-2 business days,Bank transfer,2026-06-18T00:49:34+00:00,api,ok
-Wise,,,EUR,Eurozone,🇪🇺,NPR,1000.0,174.089,0.0,1000.0,174089.0,1-2 business days,Bank transfer,2026-06-18T00:49:34+00:00,api,ok
-Wise,,,AED,United Arab Emirates,🇦🇪,NPR,1000.0,41.1822,0.0,1000.0,41182.2,1-2 business days,Bank transfer,2026-06-18T00:49:34+00:00,api,ok
-Wise,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,40.3011,0.0,1000.0,40301.1,1-2 business days,Bank transfer,2026-06-18T00:49:34+00:00,api,ok
-Wise,,,SGD,Singapore,🇸🇬,NPR,1000.0,117.43,0.0,1000.0,117430.0,1-2 business days,Bank transfer,2026-06-18T00:49:35+00:00,api,ok
-Wise,,,QAR,Qatar,🇶🇦,NPR,1000.0,41.4924,0.0,1000.0,41492.4,1-2 business days,Bank transfer,2026-06-18T00:49:35+00:00,api,ok
-Wise,,,KWD,Kuwait,🇰🇼,NPR,1000.0,492.751,0.0,1000.0,492751.0,1-2 business days,Bank transfer,2026-06-18T00:49:35+00:00,api,ok
-Wise,,,BHD,Bahrain,🇧🇭,NPR,1000.0,401.188,0.0,1000.0,401188.0,1-2 business days,Bank transfer,2026-06-18T00:49:35+00:00,api,ok
-Wise,,,OMR,Oman,🇴🇲,NPR,1000.0,392.872,0.0,1000.0,392872.0,1-2 business days,Bank transfer,2026-06-18T00:49:35+00:00,api,ok
-Wise,,,MYR,Malaysia,🇲🇾,NPR,1000.0,36.994,0.0,1000.0,36994.0,1-2 business days,Bank transfer,2026-06-18T00:49:35+00:00,api,ok
-Wise,,,JPY,Japan,🇯🇵,NPR,1000.0,0.941195,0.0,1000.0,941.2,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,KRW,South Korea,🇰🇷,NPR,1000.0,0.0991836,0.0,1000.0,99.18,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,HKD,Hong Kong,🇭🇰,NPR,1000.0,19.3026,0.0,1000.0,19302.6,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,INR,India,🇮🇳,NPR,1000.0,1.59435,0.0,1000.0,1594.35,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,ILS,Israel,🇮🇱,NPR,1000.0,51.4981,0.0,1000.0,51498.1,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,CHF,Switzerland,🇨🇭,NPR,1000.0,189.264,0.0,1000.0,189264.0,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,NOK,Norway,🇳🇴,NPR,1000.0,15.7404,0.0,1000.0,15740.4,1-2 business days,Bank transfer,2026-06-18T00:49:36+00:00,api,ok
-Wise,,,SEK,Sweden,🇸🇪,NPR,1000.0,15.92,0.0,1000.0,15920.0,1-2 business days,Bank transfer,2026-06-18T00:49:37+00:00,api,ok
-Wise,,,DKK,Denmark,🇩🇰,NPR,1000.0,23.2901,0.0,1000.0,23290.1,1-2 business days,Bank transfer,2026-06-18T00:49:37+00:00,api,ok
-Wise,,,THB,Thailand,🇹🇭,NPR,1000.0,4.6268,0.0,1000.0,4626.8,1-2 business days,Bank transfer,2026-06-18T00:49:37+00:00,api,ok
-ExchangeRate-API,,,AED,United Arab Emirates,🇦🇪,NPR,1000.0,41.2462,0.0,1000.0,41246.2,Mid-market,Reference rate,2026-06-18T00:49:33+00:00,api,ok
-ExchangeRate-API,,,AUD,Australia,🇦🇺,NPR,1000.0,106.717,0.0,1000.0,106717.0,Mid-market,Reference rate,2026-06-18T00:49:33+00:00,api,ok
-ExchangeRate-API,,,BHD,Bahrain,🇧🇭,NPR,1000.0,402.8638,0.0,1000.0,402863.8,Mid-market,Reference rate,2026-06-18T00:49:34+00:00,api,ok
-ExchangeRate-API,,,CAD,Canada,🇨🇦,NPR,1000.0,107.7681,0.0,1000.0,107768.1,Mid-market,Reference rate,2026-06-18T00:49:34+00:00,api,ok
-ExchangeRate-API,,,CHF,Switzerland,🇨🇭,NPR,1000.0,190.3584,0.0,1000.0,190358.4,Mid-market,Reference rate,2026-06-18T00:49:34+00:00,api,ok
-ExchangeRate-API,,,DKK,Denmark,🇩🇰,NPR,1000.0,23.4557,0.0,1000.0,23455.7,Mid-market,Reference rate,2026-06-18T00:49:34+00:00,api,ok
-ExchangeRate-API,,,EUR,Eurozone,🇪🇺,NPR,1000.0,175.0413,0.0,1000.0,175041.3,Mid-market,Reference rate,2026-06-18T00:49:35+00:00,api,ok
-ExchangeRate-API,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,202.5489,0.0,1000.0,202548.9,Mid-market,Reference rate,2026-06-18T00:49:35+00:00,api,ok
-ExchangeRate-API,,,HKD,Hong Kong,🇭🇰,NPR,1000.0,19.3022,0.0,1000.0,19302.2,Mid-market,Reference rate,2026-06-18T00:49:35+00:00,api,ok
-ExchangeRate-API,,,ILS,Israel,🇮🇱,NPR,1000.0,51.7488,0.0,1000.0,51748.8,Mid-market,Reference rate,2026-06-18T00:49:35+00:00,api,ok
-ExchangeRate-API,,,INR,India,🇮🇳,NPR,1000.0,1.6,0.0,1000.0,1600.0,Mid-market,Reference rate,2026-06-18T00:49:35+00:00,api,ok
-ExchangeRate-API,,,JPY,Japan,🇯🇵,NPR,1000.0,0.9431,0.0,1000.0,943.1,Mid-market,Reference rate,2026-06-18T00:49:35+00:00,api,ok
-ExchangeRate-API,,,KRW,South Korea,🇰🇷,NPR,1000.0,0.09973,0.0,1000.0,99.73,Mid-market,Reference rate,2026-06-18T00:49:36+00:00,api,ok
-ExchangeRate-API,,,KWD,Kuwait,🇰🇼,NPR,1000.0,491.7052,0.0,1000.0,491705.2,Mid-market,Reference rate,2026-06-18T00:49:36+00:00,api,ok
-ExchangeRate-API,,,MYR,Malaysia,🇲🇾,NPR,1000.0,37.1775,0.0,1000.0,37177.5,Mid-market,Reference rate,2026-06-18T00:49:36+00:00,api,ok
-ExchangeRate-API,,,NOK,Norway,🇳🇴,NPR,1000.0,15.9178,0.0,1000.0,15917.8,Mid-market,Reference rate,2026-06-18T00:49:36+00:00,api,ok
-ExchangeRate-API,,,NZD,New Zealand,🇳🇿,NPR,1000.0,87.9232,0.0,1000.0,87923.2,Mid-market,Reference rate,2026-06-18T00:49:36+00:00,api,ok
-ExchangeRate-API,,,OMR,Oman,🇴🇲,NPR,1000.0,393.9609,0.0,1000.0,393960.9,Mid-market,Reference rate,2026-06-18T00:49:36+00:00,api,ok
-ExchangeRate-API,,,QAR,Qatar,🇶🇦,NPR,1000.0,41.6145,0.0,1000.0,41614.5,Mid-market,Reference rate,2026-06-18T00:49:37+00:00,api,ok
-ExchangeRate-API,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,40.3938,0.0,1000.0,40393.8,Mid-market,Reference rate,2026-06-18T00:49:37+00:00,api,ok
-ExchangeRate-API,,,SEK,Sweden,🇸🇪,NPR,1000.0,16.082,0.0,1000.0,16082.0,Mid-market,Reference rate,2026-06-18T00:49:37+00:00,api,ok
-ExchangeRate-API,,,SGD,Singapore,🇸🇬,NPR,1000.0,117.7703,0.0,1000.0,117770.3,Mid-market,Reference rate,2026-06-18T00:49:37+00:00,api,ok
-ExchangeRate-API,,,THB,Thailand,🇹🇭,NPR,1000.0,4.6381,0.0,1000.0,4638.1,Mid-market,Reference rate,2026-06-18T00:49:37+00:00,api,ok
-ExchangeRate-API,,,USD,United States,🇺🇸,NPR,1000.0,151.4768,0.0,1000.0,151476.8,Mid-market,Reference rate,2026-06-18T00:49:38+00:00,api,ok
-Remitly,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.4,0.99,999.01,107400.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:38+00:00,scraper,ok
-Remitly,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,105.29,0.99,999.01,105290.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:38+00:00,scraper,ok
-Remitly,new_user,New User,USD,United States,🇺🇸,NPR,1000.0,150.56,3.99,996.01,150560.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:39+00:00,scraper,ok
-Remitly,existing_user,Existing User,USD,United States,🇺🇸,NPR,1000.0,150.11,3.99,996.01,150110.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:39+00:00,scraper,ok
-Remitly,new_user,New User,GBP,United Kingdom,🇬🇧,NPR,1000.0,200.53,3.99,996.01,200430.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:39+00:00,scraper,ok
-Remitly,existing_user,Existing User,GBP,United Kingdom,🇬🇧,NPR,1000.0,200.33,3.99,996.01,200330.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:39+00:00,scraper,ok
-Remitly,new_user,New User,CAD,Canada,🇨🇦,NPR,1000.0,107.54,3.99,996.01,107540.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:40+00:00,scraper,ok
-Remitly,existing_user,Existing User,CAD,Canada,🇨🇦,NPR,1000.0,105.43,3.99,996.01,105430.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:40+00:00,scraper,ok
-Remitly,new_user,New User,NZD,New Zealand,🇳🇿,NPR,1000.0,89.55,2.99,997.01,89550.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:41+00:00,scraper,ok
-Remitly,existing_user,Existing User,NZD,New Zealand,🇳🇿,NPR,1000.0,86.44,2.99,997.01,86440.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:41+00:00,scraper,ok
-Remitly,new_user,New User,EUR,Eurozone,🇪🇺,NPR,1000.0,173.72,1.99,998.01,173720.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:42+00:00,scraper,ok
-Remitly,existing_user,Existing User,EUR,Eurozone,🇪🇺,NPR,1000.0,172.0,1.99,998.01,172000.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:42+00:00,scraper,ok
-Remitly,new_user,New User,AED,United Arab Emirates,🇦🇪,NPR,1000.0,41.38,5.0,995.0,41380.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:42+00:00,scraper,ok
-Remitly,existing_user,Existing User,AED,United Arab Emirates,🇦🇪,NPR,1000.0,40.97,5.0,995.0,40970.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T00:49:42+00:00,scraper,ok
-WorldRemit,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.535,0.0,1000.0,107535.0,Minutes to 1 day,Bank transfer,2026-06-18T00:49:43+00:00,scraper,ok
-WorldRemit,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,104.9442,0.0,1000.0,104944.2,Minutes to 1 day,Bank transfer,2026-06-18T00:49:43+00:00,scraper,ok
-WorldRemit,new_user,New User,USD,United States,🇺🇸,NPR,1000.0,149.249,0.99,999.01,149249.0,Minutes to 1 day,Bank transfer,2026-06-18T00:49:44+00:00,scraper,ok
-WorldRemit,new_user,New User,GBP,United Kingdom,🇬🇧,NPR,1000.0,199.47,0.99,999.01,199470.0,Minutes to 1 day,Bank transfer,2026-06-18T00:49:45+00:00,scraper,ok
-WorldRemit,existing_user,Existing User,GBP,United Kingdom,🇬🇧,NPR,1000.0,198.7691,0.99,999.01,198572.32,Minutes to 1 day,Bank transfer,2026-06-18T00:49:45+00:00,scraper,ok
-WorldRemit,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:49:46+00:00,scraper,error
-WorldRemit,new_user,New User,NZD,New Zealand,🇳🇿,NPR,1000.0,84.451,2.99,997.01,84451.0,Minutes to 1 day,Bank transfer,2026-06-18T00:49:46+00:00,scraper,ok
-WorldRemit,existing_user,Existing User,NZD,New Zealand,🇳🇿,NPR,1000.0,84.4514,2.99,997.01,84451.4,Minutes to 1 day,Bank transfer,2026-06-18T00:49:46+00:00,scraper,ok
-WorldRemit,new_user,New User,EUR,Eurozone,🇪🇺,NPR,1000.0,171.354,1.99,998.01,171354.0,Minutes to 1 day,Bank transfer,2026-06-18T00:49:47+00:00,scraper,ok
-WorldRemit,existing_user,Existing User,EUR,Eurozone,🇪🇺,NPR,1000.0,171.3537,1.99,998.01,171353.7,Minutes to 1 day,Bank transfer,2026-06-18T00:49:47+00:00,scraper,ok
-Instarem,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,106.231,0.0,1000.0,106231.0,Same day - 2 days,Bank transfer,2026-06-18T00:49:48+00:00,scraper,ok
-Instarem,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,106.231,9.5,990.5,105221.81,Same day - 2 days,Bank transfer,2026-06-18T00:49:48+00:00,scraper,ok
-Instarem,new_user,New User,SGD,Singapore,🇸🇬,NPR,1000.0,117.4132,0.0,1000.0,117413.2,Same day - 2 days,Bank transfer,2026-06-18T00:49:49+00:00,scraper,ok
-Instarem,existing_user,Existing User,SGD,Singapore,🇸🇬,NPR,1000.0,117.4132,9.5,990.5,116297.77,Same day - 2 days,Bank transfer,2026-06-18T00:49:49+00:00,scraper,ok
-Instarem,new_user,New User,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.2399,0.0,1000.0,200535.6,Same day - 2 days,Bank transfer,2026-06-18T00:49:50+00:00,scraper,ok
-Instarem,existing_user,Existing User,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.2399,0.0,1000.0,201239.9,Same day - 2 days,Bank transfer,2026-06-18T00:49:50+00:00,scraper,ok
-Western Union,,,AUD,Australia,🇦🇺,NPR,1000.0,107.43061999999999,0.0,1000.0,107430.62,Minutes to days,Bank / Cash pickup / Mobile wallet,2026-06-18T00:50:08+00:00,scraper,ok
-Western Union,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:08+00:00,scraper,error
-Western Union,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:08+00:00,scraper,error
-Western Union,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:08+00:00,scraper,error
-Western Union,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:08+00:00,scraper,error
-Western Union,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:08+00:00,scraper,error
-Western Union,,,AED,United Arab Emirates,🇦🇪,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:08+00:00,scraper,error
-Xe Money Transfer,,,AUD,Australia,🇦🇺,NPR,1000.0,106.63595519,0.0,1000.0,106635.96,1-4 business days,Bank transfer,2026-06-18T00:50:14+00:00,scraper,ok
-Xe Money Transfer,,,USD,United States,🇺🇸,NPR,1000.0,151.81478505,0.0,1000.0,151814.79,1-4 business days,Bank transfer,2026-06-18T00:50:20+00:00,scraper,ok
-Xe Money Transfer,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,202.01978689,0.0,1000.0,202019.79,1-4 business days,Bank transfer,2026-06-18T00:50:26+00:00,scraper,ok
-Xe Money Transfer,,,CAD,Canada,🇨🇦,NPR,1000.0,107.66722535,0.0,1000.0,107667.23,1-4 business days,Bank transfer,2026-06-18T00:50:32+00:00,scraper,ok
-Xe Money Transfer,,,NZD,New Zealand,🇳🇿,NPR,1000.0,87.76080376,0.0,1000.0,87760.8,1-4 business days,Bank transfer,2026-06-18T00:50:39+00:00,scraper,ok
-Xoom,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-Xoom,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-Xoom,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-Xoom,,,EUR,Eurozone,🇪🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-MoneyGram,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-MoneyGram,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-MoneyGram,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-MoneyGram,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OFX,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OFX,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OFX,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OFX,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OFX,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OrbitRemit,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OrbitRemit,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-OrbitRemit,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-TorFX,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-TorFX,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-TorFX,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T00:50:39+00:00,scraper,error
-Mid-Market Rate,,,QAR,Qatar,🇶🇦,NPR,1000.0,41.4924,0.0,1000.0,41492.4,Reference,Mid-market via Wise,2026-06-18T00:50:39+00:00,api,ok
-Mid-Market Rate,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,40.3011,0.0,1000.0,40301.1,Reference,Mid-market via Wise,2026-06-18T00:50:39+00:00,api,ok
-Mid-Market Rate,,,KWD,Kuwait,🇰🇼,NPR,1000.0,492.751,0.0,1000.0,492751.0,Reference,Mid-market via Wise,2026-06-18T00:50:39+00:00,api,ok
-Mid-Market Rate,,,BHD,Bahrain,🇧🇭,NPR,1000.0,401.188,0.0,1000.0,401188.0,Reference,Mid-market via Wise,2026-06-18T00:50:39+00:00,api,ok
-Mid-Market Rate,,,OMR,Oman,🇴🇲,NPR,1000.0,392.872,0.0,1000.0,392872.0,Reference,Mid-market via Wise,2026-06-18T00:50:39+00:00,api,ok
-Mid-Market Rate,,,MYR,Malaysia,🇲🇾,NPR,1000.0,36.994,0.0,1000.0,36994.0,Reference,Mid-market via Wise,2026-06-18T00:50:39+00:00,api,ok
-Mid-Market Rate,,,JPY,Japan,🇯🇵,NPR,1000.0,0.941165,0.0,1000.0,941.17,Reference,Mid-market via Wise,2026-06-18T00:50:40+00:00,api,ok
-Mid-Market Rate,,,KRW,South Korea,🇰🇷,NPR,1000.0,0.0992031,0.0,1000.0,99.2,Reference,Mid-market via Wise,2026-06-18T00:50:40+00:00,api,ok
-Mid-Market Rate,,,SGD,Singapore,🇸🇬,NPR,1000.0,117.421,0.0,1000.0,117421.0,Reference,Mid-market via Wise,2026-06-18T00:50:40+00:00,api,ok
-Mid-Market Rate,,,HKD,Hong Kong,🇭🇰,NPR,1000.0,19.3021,0.0,1000.0,19302.1,Reference,Mid-market via Wise,2026-06-18T00:50:40+00:00,api,ok
-Mid-Market Rate,,,INR,India,🇮🇳,NPR,1000.0,1.59435,0.0,1000.0,1594.35,Reference,Mid-market via Wise,2026-06-18T00:50:40+00:00,api,ok
-Mid-Market Rate,,,ILS,Israel,🇮🇱,NPR,1000.0,51.4964,0.0,1000.0,51496.4,Reference,Mid-market via Wise,2026-06-18T00:50:40+00:00,api,ok
-Mid-Market Rate,,,CHF,Switzerland,🇨🇭,NPR,1000.0,189.252,0.0,1000.0,189252.0,Reference,Mid-market via Wise,2026-06-18T00:50:41+00:00,api,ok
-Mid-Market Rate,,,NOK,Norway,🇳🇴,NPR,1000.0,15.7403,0.0,1000.0,15740.3,Reference,Mid-market via Wise,2026-06-18T00:50:41+00:00,api,ok
-Mid-Market Rate,,,SEK,Sweden,🇸🇪,NPR,1000.0,15.9173,0.0,1000.0,15917.3,Reference,Mid-market via Wise,2026-06-18T00:50:41+00:00,api,ok
-Mid-Market Rate,,,DKK,Denmark,🇩🇰,NPR,1000.0,23.2881,0.0,1000.0,23288.1,Reference,Mid-market via Wise,2026-06-18T00:50:41+00:00,api,ok
-Mid-Market Rate,,,THB,Thailand,🇹🇭,NPR,1000.0,4.6268,0.0,1000.0,4626.8,Reference,Mid-market via Wise,2026-06-18T00:50:41+00:00,api,ok
-Mid-Market Rate,,,EUR,Eurozone,🇪🇺,NPR,1000.0,174.074,0.0,1000.0,174074.0,Reference,Mid-market via Wise,2026-06-18T00:50:41+00:00,api,ok
+ExchangeRate-API,,,AED,United Arab Emirates,🇦🇪,NPR,1000.0,41.2462,0.0,1000.0,41246.2,Mid-market,Reference rate,2026-06-18T01:01:04+00:00,api,ok
+ExchangeRate-API,,,AUD,Australia,🇦🇺,NPR,1000.0,106.717,0.0,1000.0,106717.0,Mid-market,Reference rate,2026-06-18T01:01:05+00:00,api,ok
+ExchangeRate-API,,,BHD,Bahrain,🇧🇭,NPR,1000.0,402.8638,0.0,1000.0,402863.8,Mid-market,Reference rate,2026-06-18T01:01:05+00:00,api,ok
+ExchangeRate-API,,,CAD,Canada,🇨🇦,NPR,1000.0,107.7681,0.0,1000.0,107768.1,Mid-market,Reference rate,2026-06-18T01:01:05+00:00,api,ok
+ExchangeRate-API,,,CHF,Switzerland,🇨🇭,NPR,1000.0,190.3584,0.0,1000.0,190358.4,Mid-market,Reference rate,2026-06-18T01:01:05+00:00,api,ok
+ExchangeRate-API,,,DKK,Denmark,🇩🇰,NPR,1000.0,23.4557,0.0,1000.0,23455.7,Mid-market,Reference rate,2026-06-18T01:01:06+00:00,api,ok
+ExchangeRate-API,,,EUR,Eurozone,🇪🇺,NPR,1000.0,175.0413,0.0,1000.0,175041.3,Mid-market,Reference rate,2026-06-18T01:01:06+00:00,api,ok
+ExchangeRate-API,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,202.5489,0.0,1000.0,202548.9,Mid-market,Reference rate,2026-06-18T01:01:06+00:00,api,ok
+ExchangeRate-API,,,HKD,Hong Kong,🇭🇰,NPR,1000.0,19.3022,0.0,1000.0,19302.2,Mid-market,Reference rate,2026-06-18T01:01:06+00:00,api,ok
+ExchangeRate-API,,,ILS,Israel,🇮🇱,NPR,1000.0,51.7488,0.0,1000.0,51748.8,Mid-market,Reference rate,2026-06-18T01:01:07+00:00,api,ok
+ExchangeRate-API,,,INR,India,🇮🇳,NPR,1000.0,1.6,0.0,1000.0,1600.0,Mid-market,Reference rate,2026-06-18T01:01:07+00:00,api,ok
+ExchangeRate-API,,,JPY,Japan,🇯🇵,NPR,1000.0,0.9431,0.0,1000.0,943.1,Mid-market,Reference rate,2026-06-18T01:01:07+00:00,api,ok
+ExchangeRate-API,,,KRW,South Korea,🇰🇷,NPR,1000.0,0.09973,0.0,1000.0,99.73,Mid-market,Reference rate,2026-06-18T01:01:08+00:00,api,ok
+ExchangeRate-API,,,KWD,Kuwait,🇰🇼,NPR,1000.0,491.7052,0.0,1000.0,491705.2,Mid-market,Reference rate,2026-06-18T01:01:08+00:00,api,ok
+ExchangeRate-API,,,MYR,Malaysia,🇲🇾,NPR,1000.0,37.1775,0.0,1000.0,37177.5,Mid-market,Reference rate,2026-06-18T01:01:08+00:00,api,ok
+ExchangeRate-API,,,NOK,Norway,🇳🇴,NPR,1000.0,15.9178,0.0,1000.0,15917.8,Mid-market,Reference rate,2026-06-18T01:01:08+00:00,api,ok
+ExchangeRate-API,,,NZD,New Zealand,🇳🇿,NPR,1000.0,87.9232,0.0,1000.0,87923.2,Mid-market,Reference rate,2026-06-18T01:01:08+00:00,api,ok
+ExchangeRate-API,,,OMR,Oman,🇴🇲,NPR,1000.0,393.9609,0.0,1000.0,393960.9,Mid-market,Reference rate,2026-06-18T01:01:09+00:00,api,ok
+ExchangeRate-API,,,QAR,Qatar,🇶🇦,NPR,1000.0,41.6145,0.0,1000.0,41614.5,Mid-market,Reference rate,2026-06-18T01:01:09+00:00,api,ok
+ExchangeRate-API,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,40.3938,0.0,1000.0,40393.8,Mid-market,Reference rate,2026-06-18T01:01:09+00:00,api,ok
+ExchangeRate-API,,,SEK,Sweden,🇸🇪,NPR,1000.0,16.082,0.0,1000.0,16082.0,Mid-market,Reference rate,2026-06-18T01:01:09+00:00,api,ok
+ExchangeRate-API,,,SGD,Singapore,🇸🇬,NPR,1000.0,117.7703,0.0,1000.0,117770.3,Mid-market,Reference rate,2026-06-18T01:01:10+00:00,api,ok
+ExchangeRate-API,,,THB,Thailand,🇹🇭,NPR,1000.0,4.6381,0.0,1000.0,4638.1,Mid-market,Reference rate,2026-06-18T01:01:10+00:00,api,ok
+ExchangeRate-API,,,USD,United States,🇺🇸,NPR,1000.0,151.4768,0.0,1000.0,151476.8,Mid-market,Reference rate,2026-06-18T01:01:10+00:00,api,ok
+Wise,,,AUD,Australia,🇦🇺,NPR,1000.0,106.223,0.0,1000.0,106223.0,1-2 business days,Bank transfer,2026-06-18T01:01:04+00:00,api,ok
+Wise,,,USD,United States,🇺🇸,NPR,1000.0,151.25,0.0,1000.0,151250.0,1-2 business days,Bank transfer,2026-06-18T01:01:05+00:00,api,ok
+Wise,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.268,0.0,1000.0,201268.0,1-2 business days,Bank transfer,2026-06-18T01:01:05+00:00,api,ok
+Wise,,,CAD,Canada,🇨🇦,NPR,1000.0,107.292,0.0,1000.0,107292.0,1-2 business days,Bank transfer,2026-06-18T01:01:05+00:00,api,ok
+Wise,,,NZD,New Zealand,🇳🇿,NPR,1000.0,87.3923,0.0,1000.0,87392.3,1-2 business days,Bank transfer,2026-06-18T01:01:06+00:00,api,ok
+Wise,,,EUR,Eurozone,🇪🇺,NPR,1000.0,174.18,0.0,1000.0,174180.0,1-2 business days,Bank transfer,2026-06-18T01:01:06+00:00,api,ok
+Wise,,,AED,United Arab Emirates,🇦🇪,NPR,1000.0,41.1822,0.0,1000.0,41182.2,1-2 business days,Bank transfer,2026-06-18T01:01:06+00:00,api,ok
+Wise,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,40.3011,0.0,1000.0,40301.1,1-2 business days,Bank transfer,2026-06-18T01:01:07+00:00,api,ok
+Wise,,,SGD,Singapore,🇸🇬,NPR,1000.0,117.435,0.0,1000.0,117435.0,1-2 business days,Bank transfer,2026-06-18T01:01:07+00:00,api,ok
+Wise,,,QAR,Qatar,🇶🇦,NPR,1000.0,41.4924,0.0,1000.0,41492.4,1-2 business days,Bank transfer,2026-06-18T01:01:07+00:00,api,ok
+Wise,,,KWD,Kuwait,🇰🇼,NPR,1000.0,492.751,0.0,1000.0,492751.0,1-2 business days,Bank transfer,2026-06-18T01:01:07+00:00,api,ok
+Wise,,,BHD,Bahrain,🇧🇭,NPR,1000.0,401.188,0.0,1000.0,401188.0,1-2 business days,Bank transfer,2026-06-18T01:01:08+00:00,api,ok
+Wise,,,OMR,Oman,🇴🇲,NPR,1000.0,392.872,0.0,1000.0,392872.0,1-2 business days,Bank transfer,2026-06-18T01:01:08+00:00,api,ok
+Wise,,,MYR,Malaysia,🇲🇾,NPR,1000.0,36.9985,0.0,1000.0,36998.5,1-2 business days,Bank transfer,2026-06-18T01:01:08+00:00,api,ok
+Wise,,,JPY,Japan,🇯🇵,NPR,1000.0,0.941195,0.0,1000.0,941.2,1-2 business days,Bank transfer,2026-06-18T01:01:08+00:00,api,ok
+Wise,,,KRW,South Korea,🇰🇷,NPR,1000.0,0.0991803,0.0,1000.0,99.18,1-2 business days,Bank transfer,2026-06-18T01:01:09+00:00,api,ok
+Wise,,,HKD,Hong Kong,🇭🇰,NPR,1000.0,19.3027,0.0,1000.0,19302.7,1-2 business days,Bank transfer,2026-06-18T01:01:09+00:00,api,ok
+Wise,,,INR,India,🇮🇳,NPR,1000.0,1.59557,0.0,1000.0,1595.57,1-2 business days,Bank transfer,2026-06-18T01:01:09+00:00,api,ok
+Wise,,,ILS,Israel,🇮🇱,NPR,1000.0,51.4701,0.0,1000.0,51470.1,1-2 business days,Bank transfer,2026-06-18T01:01:09+00:00,api,ok
+Wise,,,CHF,Switzerland,🇨🇭,NPR,1000.0,189.335,0.0,1000.0,189335.0,1-2 business days,Bank transfer,2026-06-18T01:01:10+00:00,api,ok
+Wise,,,NOK,Norway,🇳🇴,NPR,1000.0,15.755,0.0,1000.0,15755.0,1-2 business days,Bank transfer,2026-06-18T01:01:10+00:00,api,ok
+Wise,,,SEK,Sweden,🇸🇪,NPR,1000.0,15.9327,0.0,1000.0,15932.7,1-2 business days,Bank transfer,2026-06-18T01:01:10+00:00,api,ok
+Wise,,,DKK,Denmark,🇩🇰,NPR,1000.0,23.3033,0.0,1000.0,23303.3,1-2 business days,Bank transfer,2026-06-18T01:01:10+00:00,api,ok
+Wise,,,THB,Thailand,🇹🇭,NPR,1000.0,4.62963,0.0,1000.0,4629.63,1-2 business days,Bank transfer,2026-06-18T01:01:11+00:00,api,ok
+Remitly,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.38,0.99,999.01,107380.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:11+00:00,scraper,ok
+Remitly,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,105.27,0.99,999.01,105270.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:11+00:00,scraper,ok
+Remitly,new_user,New User,USD,United States,🇺🇸,NPR,1000.0,150.56,3.99,996.01,150560.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:12+00:00,scraper,ok
+Remitly,existing_user,Existing User,USD,United States,🇺🇸,NPR,1000.0,150.11,3.99,996.01,150110.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:12+00:00,scraper,ok
+Remitly,new_user,New User,GBP,United Kingdom,🇬🇧,NPR,1000.0,200.5,3.99,996.01,200400.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:13+00:00,scraper,ok
+Remitly,existing_user,Existing User,GBP,United Kingdom,🇬🇧,NPR,1000.0,200.3,3.99,996.01,200300.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:13+00:00,scraper,ok
+Remitly,new_user,New User,CAD,Canada,🇨🇦,NPR,1000.0,107.54,3.99,996.01,107540.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:13+00:00,scraper,ok
+Remitly,existing_user,Existing User,CAD,Canada,🇨🇦,NPR,1000.0,105.43,3.99,996.01,105430.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:13+00:00,scraper,ok
+Remitly,new_user,New User,NZD,New Zealand,🇳🇿,NPR,1000.0,89.57,2.99,997.01,89570.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:14+00:00,scraper,ok
+Remitly,existing_user,Existing User,NZD,New Zealand,🇳🇿,NPR,1000.0,86.46,2.99,997.01,86460.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:14+00:00,scraper,ok
+Remitly,new_user,New User,EUR,Eurozone,🇪🇺,NPR,1000.0,173.69,1.99,998.01,173690.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:15+00:00,scraper,ok
+Remitly,existing_user,Existing User,EUR,Eurozone,🇪🇺,NPR,1000.0,171.97,1.99,998.01,171970.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:15+00:00,scraper,ok
+Remitly,new_user,New User,AED,United Arab Emirates,🇦🇪,NPR,1000.0,41.38,5.0,995.0,41380.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:18+00:00,scraper,ok
+Remitly,existing_user,Existing User,AED,United Arab Emirates,🇦🇪,NPR,1000.0,40.97,5.0,995.0,40970.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-18T01:01:18+00:00,scraper,ok
+WorldRemit,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.535,0.0,1000.0,107535.0,Minutes to 1 day,Bank transfer,2026-06-18T01:01:19+00:00,scraper,ok
+WorldRemit,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,104.9442,0.0,1000.0,104944.2,Minutes to 1 day,Bank transfer,2026-06-18T01:01:19+00:00,scraper,ok
+WorldRemit,new_user,New User,USD,United States,🇺🇸,NPR,1000.0,149.249,0.99,999.01,149249.0,Minutes to 1 day,Bank transfer,2026-06-18T01:01:20+00:00,scraper,ok
+WorldRemit,new_user,New User,GBP,United Kingdom,🇬🇧,NPR,1000.0,199.47,0.99,999.01,199470.0,Minutes to 1 day,Bank transfer,2026-06-18T01:01:20+00:00,scraper,ok
+WorldRemit,existing_user,Existing User,GBP,United Kingdom,🇬🇧,NPR,1000.0,198.7691,0.99,999.01,198572.32,Minutes to 1 day,Bank transfer,2026-06-18T01:01:20+00:00,scraper,ok
+WorldRemit,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:21+00:00,scraper,error
+WorldRemit,new_user,New User,NZD,New Zealand,🇳🇿,NPR,1000.0,84.451,2.99,997.01,84451.0,Minutes to 1 day,Bank transfer,2026-06-18T01:01:22+00:00,scraper,ok
+WorldRemit,existing_user,Existing User,NZD,New Zealand,🇳🇿,NPR,1000.0,84.4514,2.99,997.01,84451.4,Minutes to 1 day,Bank transfer,2026-06-18T01:01:22+00:00,scraper,ok
+WorldRemit,new_user,New User,EUR,Eurozone,🇪🇺,NPR,1000.0,171.354,1.99,998.01,171354.0,Minutes to 1 day,Bank transfer,2026-06-18T01:01:23+00:00,scraper,ok
+WorldRemit,existing_user,Existing User,EUR,Eurozone,🇪🇺,NPR,1000.0,171.3537,1.99,998.01,171353.7,Minutes to 1 day,Bank transfer,2026-06-18T01:01:23+00:00,scraper,ok
+Instarem,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,106.2007,0.0,1000.0,106200.7,Same day - 2 days,Bank transfer,2026-06-18T01:01:24+00:00,scraper,ok
+Instarem,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,106.2007,9.5,990.5,105191.79,Same day - 2 days,Bank transfer,2026-06-18T01:01:24+00:00,scraper,ok
+Instarem,new_user,New User,SGD,Singapore,🇸🇬,NPR,1000.0,117.4132,0.0,1000.0,117413.2,Same day - 2 days,Bank transfer,2026-06-18T01:01:25+00:00,scraper,ok
+Instarem,existing_user,Existing User,SGD,Singapore,🇸🇬,NPR,1000.0,117.4132,9.5,990.5,116297.77,Same day - 2 days,Bank transfer,2026-06-18T01:01:25+00:00,scraper,ok
+Instarem,new_user,New User,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.2551,0.0,1000.0,200550.7,Same day - 2 days,Bank transfer,2026-06-18T01:01:26+00:00,scraper,ok
+Instarem,existing_user,Existing User,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.2551,0.0,1000.0,201255.1,Same day - 2 days,Bank transfer,2026-06-18T01:01:26+00:00,scraper,ok
+Western Union,,,AUD,Australia,🇦🇺,NPR,1000.0,107.43061999999999,0.0,1000.0,107430.62,Minutes to days,Bank / Cash pickup / Mobile wallet,2026-06-18T01:01:45+00:00,scraper,ok
+Western Union,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:45+00:00,scraper,error
+Western Union,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:45+00:00,scraper,error
+Western Union,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:45+00:00,scraper,error
+Western Union,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:45+00:00,scraper,error
+Western Union,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:45+00:00,scraper,error
+Western Union,,,AED,United Arab Emirates,🇦🇪,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:01:45+00:00,scraper,error
+Xe Money Transfer,,,AUD,Australia,🇦🇺,NPR,1000.0,106.47286664,0.0,1000.0,106472.87,1-4 business days,Bank transfer,2026-06-18T01:01:51+00:00,scraper,ok
+Xe Money Transfer,,,USD,United States,🇺🇸,NPR,1000.0,151.67467071,0.0,1000.0,151674.67,1-4 business days,Bank transfer,2026-06-18T01:01:57+00:00,scraper,ok
+Xe Money Transfer,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,201.84045468,0.0,1000.0,201840.45,1-4 business days,Bank transfer,2026-06-18T01:02:03+00:00,scraper,ok
+Xe Money Transfer,,,CAD,Canada,🇨🇦,NPR,1000.0,107.5946126,0.0,1000.0,107594.61,1-4 business days,Bank transfer,2026-06-18T01:02:10+00:00,scraper,ok
+Xe Money Transfer,,,NZD,New Zealand,🇳🇿,NPR,1000.0,87.65196539,0.0,1000.0,87651.97,1-4 business days,Bank transfer,2026-06-18T01:02:16+00:00,scraper,ok
+Xoom,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+Xoom,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+Xoom,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+Xoom,,,EUR,Eurozone,🇪🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+MoneyGram,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+MoneyGram,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+MoneyGram,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+MoneyGram,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OFX,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OFX,,,USD,United States,🇺🇸,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OFX,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OFX,,,CAD,Canada,🇨🇦,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OFX,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OrbitRemit,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OrbitRemit,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+OrbitRemit,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+TorFX,,,AUD,Australia,🇦🇺,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+TorFX,,,GBP,United Kingdom,🇬🇧,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+TorFX,,,NZD,New Zealand,🇳🇿,NPR,1000.0,0.0,0.0,0.0,0.0,,,2026-06-18T01:02:16+00:00,scraper,error
+Mid-Market Rate,,,QAR,Qatar,🇶🇦,NPR,1000.0,41.4924,0.0,1000.0,41492.4,Reference,Mid-market via Wise,2026-06-18T01:02:16+00:00,api,ok
+Mid-Market Rate,,,SAR,Saudi Arabia,🇸🇦,NPR,1000.0,40.3,0.0,1000.0,40300.0,Reference,Mid-market via Wise,2026-06-18T01:02:16+00:00,api,ok
+Mid-Market Rate,,,KWD,Kuwait,🇰🇼,NPR,1000.0,492.751,0.0,1000.0,492751.0,Reference,Mid-market via Wise,2026-06-18T01:02:17+00:00,api,ok
+Mid-Market Rate,,,BHD,Bahrain,🇧🇭,NPR,1000.0,401.188,0.0,1000.0,401188.0,Reference,Mid-market via Wise,2026-06-18T01:02:17+00:00,api,ok
+Mid-Market Rate,,,OMR,Oman,🇴🇲,NPR,1000.0,392.872,0.0,1000.0,392872.0,Reference,Mid-market via Wise,2026-06-18T01:02:17+00:00,api,ok
+Mid-Market Rate,,,MYR,Malaysia,🇲🇾,NPR,1000.0,37.0031,0.0,1000.0,37003.1,Reference,Mid-market via Wise,2026-06-18T01:02:18+00:00,api,ok
+Mid-Market Rate,,,JPY,Japan,🇯🇵,NPR,1000.0,0.941312,0.0,1000.0,941.31,Reference,Mid-market via Wise,2026-06-18T01:02:18+00:00,api,ok
+Mid-Market Rate,,,KRW,South Korea,🇰🇷,NPR,1000.0,0.0991901,0.0,1000.0,99.19,Reference,Mid-market via Wise,2026-06-18T01:02:18+00:00,api,ok
+Mid-Market Rate,,,SGD,Singapore,🇸🇬,NPR,1000.0,117.453,0.0,1000.0,117453.0,Reference,Mid-market via Wise,2026-06-18T01:02:18+00:00,api,ok
+Mid-Market Rate,,,HKD,Hong Kong,🇭🇰,NPR,1000.0,19.3027,0.0,1000.0,19302.7,Reference,Mid-market via Wise,2026-06-18T01:02:19+00:00,api,ok
+Mid-Market Rate,,,INR,India,🇮🇳,NPR,1000.0,1.59563,0.0,1000.0,1595.63,Reference,Mid-market via Wise,2026-06-18T01:02:19+00:00,api,ok
+Mid-Market Rate,,,ILS,Israel,🇮🇱,NPR,1000.0,51.4456,0.0,1000.0,51445.6,Reference,Mid-market via Wise,2026-06-18T01:02:19+00:00,api,ok
+Mid-Market Rate,,,CHF,Switzerland,🇨🇭,NPR,1000.0,189.358,0.0,1000.0,189358.0,Reference,Mid-market via Wise,2026-06-18T01:02:20+00:00,api,ok
+Mid-Market Rate,,,NOK,Norway,🇳🇴,NPR,1000.0,15.755,0.0,1000.0,15755.0,Reference,Mid-market via Wise,2026-06-18T01:02:20+00:00,api,ok
+Mid-Market Rate,,,SEK,Sweden,🇸🇪,NPR,1000.0,15.9335,0.0,1000.0,15933.5,Reference,Mid-market via Wise,2026-06-18T01:02:20+00:00,api,ok
+Mid-Market Rate,,,DKK,Denmark,🇩🇰,NPR,1000.0,23.3087,0.0,1000.0,23308.7,Reference,Mid-market via Wise,2026-06-18T01:02:20+00:00,api,ok
+Mid-Market Rate,,,THB,Thailand,🇹🇭,NPR,1000.0,4.62963,0.0,1000.0,4629.63,Reference,Mid-market via Wise,2026-06-18T01:02:21+00:00,api,ok
+Mid-Market Rate,,,EUR,Eurozone,🇪🇺,NPR,1000.0,174.217,0.0,1000.0,174217.0,Reference,Mid-market via Wise,2026-06-18T01:02:21+00:00,api,ok
