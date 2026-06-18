@@ -132,7 +132,7 @@ fetch('https://YOUR_USERNAME.github.io/REPO-NAME/data/latest_rates.json')
 | WorldRemit | GraphQL API | 5/6 corridors (CAD unavailable); New + Existing user rates |
 | Instarem | REST API | AUD, GBP, SGD; New + Existing user rates/fees |
 | Remitly | Calculator API | All 7 corridors; New + Existing user rates |
-| Western Union | Playwright calculator | AUD only (landing-page widget) |
+| Western Union | Playwright calculator | AUD only; New + Existing user rates |
 | Xe | Playwright (`xe.com/currencyconverter`) | All corridors |
 | Xoom | — | Skipped (sign-in required) |
 | MoneyGram | — | Skipped (captcha / bot block) |

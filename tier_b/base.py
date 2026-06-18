@@ -65,9 +65,9 @@ class BaseBrowserScraper(ABC):
         records: list[RateRecord] = []
         for currency in self.corridors:
             try:
-                record = self.fetch_corridor(currency)
-                records.append(record)
-                if record.status == "ok":
+                corridor_records = self.fetch_corridor_records(currency)
+                records.extend(corridor_records)
+                if any(r.status == "ok" for r in corridor_records):
                     logger.info("%s %s -> NPR: ok", self.provider_name, currency)
                 else:
                     logger.warning("%s %s -> NPR: error", self.provider_name, currency)
@@ -84,6 +84,9 @@ class BaseBrowserScraper(ABC):
                 )
         return records
 
+    def fetch_corridor_records(self, from_currency: str) -> list[RateRecord]:
+        return [self.fetch_corridor(from_currency)]
+
     @abstractmethod
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         ...
@@ -96,6 +99,8 @@ class BaseBrowserScraper(ABC):
         receive_amount: float | None = None,
         transfer_speed: str = "",
         delivery_method: str = "",
+        customer_type: str = "",
+        rate_label: str = "",
     ) -> RateRecord:
         net_send, computed_receive = compute_receive_amount(
             self.send_amount, fee, exchange_rate
@@ -112,6 +117,8 @@ class BaseBrowserScraper(ABC):
             receive_amount=round(receive, 2),
             transfer_speed=transfer_speed,
             delivery_method=delivery_method,
+            customer_type=customer_type,
+            rate_label=rate_label,
             timestamp=utc_now_iso(),
             source="scraper",
             status="ok",
