@@ -13,6 +13,8 @@ from utils import logger
 
 CSV_FIELDS = [
     "provider",
+    "customer_type",
+    "rate_label",
     "from_currency",
     "from_country",
     "from_flag",

@@ -30,6 +30,32 @@ def test_error_record():
 def test_pipeline_result_corridors():
     rates = [
         RateRecord(
+            provider="WorldRemit",
+            from_currency="AUD",
+            to_currency="NPR",
+            exchange_rate=108.0,
+            send_amount=1000.0,
+            receive_amount=108000.0,
+            fee=0.0,
+            timestamp="2026-06-11T12:00:00+00:00",
+            status="ok",
+            customer_type="new_user",
+            rate_label="New User",
+        ),
+        RateRecord(
+            provider="WorldRemit",
+            from_currency="AUD",
+            to_currency="NPR",
+            exchange_rate=105.0,
+            send_amount=1000.0,
+            receive_amount=105000.0,
+            fee=0.0,
+            timestamp="2026-06-11T12:00:00+00:00",
+            status="ok",
+            customer_type="existing_user",
+            rate_label="Existing User",
+        ),
+        RateRecord(
             provider="Wise",
             from_currency="AUD",
             to_currency="NPR",
@@ -40,20 +66,11 @@ def test_pipeline_result_corridors():
             timestamp="2026-06-11T12:00:00+00:00",
             status="ok",
         ),
-        RateRecord(
-            provider="Remitly",
-            from_currency="AUD",
-            to_currency="NPR",
-            exchange_rate=87.0,
-            send_amount=1000.0,
-            receive_amount=87000.0,
-            fee=0.0,
-            timestamp="2026-06-11T12:00:00+00:00",
-            status="ok",
-        ),
     ]
     result = PipelineResult(all_rates=rates)
     corridors = result.corridors
     assert len(corridors) == 1
     assert corridors[0]["from_currency"] == "AUD"
-    assert len(corridors[0]["rates"]) == 2
+    assert len(corridors[0]["rates"]) == 3
+    labels = {rate["rate_label"] for rate in corridors[0]["rates"] if rate["rate_label"]}
+    assert labels == {"New User", "Existing User"}

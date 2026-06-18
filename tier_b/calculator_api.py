@@ -38,9 +38,9 @@ class CalculatorApiScraper:
         records: list[RateRecord] = []
         for currency in self.corridors:
             try:
-                record = self.fetch_corridor(currency)
-                records.append(record)
-                if record.status == "ok":
+                corridor_records = self.fetch_corridor_records(currency)
+                records.extend(corridor_records)
+                if any(r.status == "ok" for r in corridor_records):
                     logger.info("%s %s -> NPR: ok", self.provider_name, currency)
             except Exception as exc:
                 logger.error("%s %s failed: %s", self.provider_name, currency, exc)
@@ -55,6 +55,9 @@ class CalculatorApiScraper:
                 )
             time.sleep(0.5)
         return records
+
+    def fetch_corridor_records(self, from_currency: str) -> list[RateRecord]:
+        return [self.fetch_corridor(from_currency)]
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         raise NotImplementedError
@@ -79,21 +82,37 @@ class CalculatorApiScraper:
         receive_amount: float | None = None,
         transfer_speed: str = "",
         delivery_method: str = "",
+        customer_type: str = "",
+        rate_label: str = "",
+        send_amount: float | None = None,
     ) -> RateRecord:
-        net_send = round(self.send_amount - fee, 2)
-        receive = receive_amount if receive_amount is not None else round(net_send * exchange_rate, 2)
+        amount = send_amount if send_amount is not None else self.send_amount
+        net_send = round(amount - fee, 2)
+        receive = (
+            receive_amount
+            if receive_amount is not None
+            else round(net_send * exchange_rate, 2)
+        )
         return RateRecord(
             provider=self.provider_name,
             from_currency=from_currency,
             to_currency="NPR",
-            send_amount=self.send_amount,
+            send_amount=amount,
             exchange_rate=round(exchange_rate, 6),
             fee=round(fee, 2),
             net_send_amount=net_send,
             receive_amount=round(receive, 2),
             transfer_speed=transfer_speed,
             delivery_method=delivery_method,
+            customer_type=customer_type,
+            rate_label=rate_label,
             timestamp=utc_now_iso(),
             source=self.source_label,
             status="ok",
         )
+
+    @staticmethod
+    def _effective_rate(send_amount: float, receive_amount: float) -> float:
+        if send_amount <= 0:
+            raise ValueError("Send amount must be positive")
+        return receive_amount / send_amount

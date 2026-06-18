@@ -129,6 +129,8 @@ Each rate includes:
 ```json
 {
   "provider": "Remitly",
+  "customer_type": "new_user",
+  "rate_label": "New User",
   "from_currency": "AUD",
   "from_country": "Australia",
   "from_flag": "🇦🇺",

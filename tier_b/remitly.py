@@ -27,6 +27,9 @@ class RemitlyScraper(CalculatorApiScraper):
     corridors = list(REMITLY_LOCALE.keys())
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
+        return self.fetch_corridor_records(from_currency)[0]
+
+    def fetch_corridor_records(self, from_currency: str) -> list[RateRecord]:
         source_country = REMITLY_COUNTRY.get(from_currency)
         if not source_country:
             raise ValueError(f"Unsupported corridor: {from_currency}")
@@ -44,23 +47,47 @@ class RemitlyScraper(CalculatorApiScraper):
         rate_data = estimate.get("exchange_rate", {})
         fee_data = estimate.get("fee", {})
 
-        rate = float(
-            rate_data.get("promotional_exchange_rate")
-            or rate_data.get("base_rate")
-            or 0
-        )
+        promo_rate = float(rate_data.get("promotional_exchange_rate") or 0)
+        base_rate = float(rate_data.get("base_rate") or 0)
         fee = float(fee_data.get("total_fee_amount", 0) or 0)
         receive = estimate.get("receive_amount")
-        receive_amount = float(receive) if receive is not None else None
+        promo_receive = float(receive) if receive is not None else None
 
-        if not rate:
+        if not promo_rate and not base_rate:
             raise ValueError(f"No rate in Remitly response: {data}")
 
-        return self._build_record(
-            from_currency=from_currency,
-            exchange_rate=rate,
-            fee=fee,
-            receive_amount=receive_amount,
-            transfer_speed="Minutes to 3 business days",
-            delivery_method="Bank deposit / Cash pickup",
-        )
+        common = {
+            "from_currency": from_currency,
+            "fee": fee,
+            "transfer_speed": "Minutes to 3 business days",
+            "delivery_method": "Bank deposit / Cash pickup",
+        }
+
+        records: list[RateRecord] = []
+        if promo_rate:
+            records.append(
+                self._build_record(
+                    **common,
+                    exchange_rate=promo_rate,
+                    receive_amount=promo_receive,
+                    customer_type="new_user",
+                    rate_label="New User",
+                )
+            )
+
+        if base_rate:
+            existing_receive = round(self.send_amount * base_rate, 2)
+            records.append(
+                self._build_record(
+                    **common,
+                    exchange_rate=base_rate,
+                    receive_amount=existing_receive,
+                    customer_type="existing_user",
+                    rate_label="Existing User",
+                )
+            )
+
+        if not records:
+            raise ValueError(f"No usable Remitly rates for {from_currency}/NPR")
+
+        return records

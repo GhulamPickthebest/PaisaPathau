@@ -129,9 +129,9 @@ fetch('https://YOUR_USERNAME.github.io/REPO-NAME/data/latest_rates.json')
 
 | Provider | Method | Status |
 |----------|--------|--------|
-| Remitly | Calculator API (`api.remitly.io`) | All 7 corridors, with fees |
-| WorldRemit | GraphQL API | 5/6 corridors (CAD unavailable) |
-| Instarem | REST API (`instarem.com/api/v1/public`) | AUD, GBP, SGD (with fees) |
+| WorldRemit | GraphQL API | 5/6 corridors (CAD unavailable); New + Existing user rates |
+| Instarem | REST API | AUD, GBP, SGD; New + Existing user rates/fees |
+| Remitly | Calculator API | All 7 corridors; New + Existing user rates |
 | Western Union | Playwright calculator | AUD only (landing-page widget) |
 | Xe | Playwright (`xe.com/currencyconverter`) | All corridors |
 | Xoom | — | Skipped (sign-in required) |
@@ -151,6 +151,17 @@ Full browser run (WU AUD + Xe): `python main.py --once` (~5–10 min)
 | C | API fallback | Mid-market rates for QAR, SAR, KWD, MYR, JPY, etc. |
 
 Default send amount: **1000** (configurable via `SEND_AMOUNT` in `.env` or `--send-amount` flag).
+
+### New vs existing user rates
+
+Providers that offer different pricing return **two records** per corridor:
+
+| Field | Example |
+|-------|---------|
+| `customer_type` | `new_user` or `existing_user` |
+| `rate_label` | `"New User"` or `"Existing User"` |
+
+Filter in WordPress by `rate_label` or `customer_type`. Providers without a split leave both fields empty.
 
 ---
 

@@ -28,6 +28,8 @@ class RateRecord:
     transfer_speed: str = ""
     delivery_method: str = ""
     source: Literal["api", "scraper"] = "api"
+    customer_type: str = ""
+    rate_label: str = ""
     error_message: str = ""
 
     def __post_init__(self) -> None:

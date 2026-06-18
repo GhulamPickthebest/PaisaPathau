@@ -15,6 +15,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS rates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     provider TEXT,
+    customer_type TEXT,
     from_currency TEXT,
     exchange_rate REAL,
     fee REAL,
@@ -30,6 +31,12 @@ def init_db(db_path: Path = DB_PATH) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(db_path) as conn:
         conn.execute(SCHEMA)
+        columns = {
+            row[1]
+            for row in conn.execute("PRAGMA table_info(rates)").fetchall()
+        }
+        if "customer_type" not in columns:
+            conn.execute("ALTER TABLE rates ADD COLUMN customer_type TEXT DEFAULT ''")
         conn.commit()
     logger.debug("Database initialized at %s", db_path)
 
@@ -39,6 +46,7 @@ def insert_rates(records: list[RateRecord], db_path: Path = DB_PATH) -> int:
     rows = [
         (
             r.provider,
+            r.customer_type,
             r.from_currency,
             r.exchange_rate,
             r.fee,
@@ -53,9 +61,9 @@ def insert_rates(records: list[RateRecord], db_path: Path = DB_PATH) -> int:
         conn.executemany(
             """
             INSERT INTO rates (
-                provider, from_currency, exchange_rate, fee,
+                provider, customer_type, from_currency, exchange_rate, fee,
                 receive_amount, send_amount, timestamp, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             rows,
         )

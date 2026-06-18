@@ -30,6 +30,9 @@ class InstaremScraper(CalculatorApiScraper):
         )
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
+        return self.fetch_corridor_records(from_currency)[0]
+
+    def fetch_corridor_records(self, from_currency: str) -> list[RateRecord]:
         country_code = INSTAREM_COUNTRY.get(from_currency)
         if not country_code:
             raise ValueError(f"Unsupported corridor: {from_currency}")
@@ -58,23 +61,40 @@ class InstaremScraper(CalculatorApiScraper):
                 "source_amount": int(self.send_amount),
             },
         )
-        cfg = data["data"]["transaction_config"]
+        payload = data["data"]
+        cfg = payload["transaction_config"]
         rate = float(cfg["fx_rate"])
-        fee = float(cfg.get("total_fee_amount") or 0)
+        new_fee = float(payload.get("transaction_fee_amount") or 0)
+        existing_fee = float(payload.get("regular_transaction_fee_amount") or 0)
+        new_receive = float(payload.get("destination_amount") or 0)
 
-        if fee == 0 and cfg.get("regular_total_fee_amount"):
-            base_amount = float(cfg.get("from_currency_amount") or 100)
-            fee = float(cfg["regular_total_fee_amount"]) * (self.send_amount / base_amount)
-            discount = cfg.get("first_transaction_fee_config", {}).get(
-                "discount_percentage", 0
+        common = {
+            "from_currency": from_currency,
+            "exchange_rate": rate,
+            "transfer_speed": "Same day - 2 days",
+            "delivery_method": "Bank transfer",
+        }
+
+        records = [
+            self._build_record(
+                **common,
+                fee=round(new_fee, 2),
+                receive_amount=new_receive,
+                customer_type="new_user",
+                rate_label="New User",
             )
-            if discount == 100:
-                fee = 0.0
+        ]
 
-        return self._build_record(
-            from_currency=from_currency,
-            exchange_rate=rate,
-            fee=round(fee, 2),
-            transfer_speed="Same day - 2 days",
-            delivery_method="Bank transfer",
-        )
+        if existing_fee != new_fee or payload.get("first_instarem_transaction"):
+            existing_receive = round((self.send_amount - existing_fee) * rate, 2)
+            records.append(
+                self._build_record(
+                    **common,
+                    fee=round(existing_fee, 2),
+                    receive_amount=existing_receive,
+                    customer_type="existing_user",
+                    rate_label="Existing User",
+                )
+            )
+
+        return records
