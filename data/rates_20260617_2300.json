@@ -1,8 +1,8 @@
 {
   "last_updated": "2026-06-17T23:00:56+00:00",
   "send_amount": 1000.0,
-  "total_corridors": 1,
-  "total_providers": 1,
+  "total_corridors": 24,
+  "total_providers": 7,
   "corridors": [
     {
       "from_currency": "AED",
