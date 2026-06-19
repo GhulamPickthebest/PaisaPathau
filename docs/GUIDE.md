@@ -97,6 +97,7 @@ All written to `data/` after each run:
 | `latest_rates.json` | Live rates for WordPress |
 | `rates_YYYYMMDD_HHMM.json` | Timestamped snapshot (auto-deleted after 3 days) |
 | `latest_rates.csv` | Flat export |
+| `aud_npr_transfer_methods.json` | AUD→NPR per-method matrix (fees, new/existing rates, speeds) |
 | `rates_history.db` | SQLite trend history |
 
 ---

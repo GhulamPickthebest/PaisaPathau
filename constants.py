@@ -173,3 +173,36 @@ WISE_CORRIDORS: list[str] = [
     "DKK",
     "THB",
 ]
+
+# Standard transfer method labels (AUD/NPR matrix)
+STANDARD_TRANSFER_METHODS: list[str] = [
+    "Bank Transfer",
+    "Cash Pickup",
+    "Mobile Money Transfer",
+    "Wallet Transfer",
+]
+
+# Provider delivery speed ranges for NPR corridors
+PROVIDER_TRANSFER_SPEEDS: dict[str, dict[str, str]] = {
+    "Remitly": {"fastest": "Minutes", "slowest": "3 business days"},
+    "WorldRemit": {"fastest": "Minutes", "slowest": "1 business day"},
+    "Instarem": {"fastest": "Same day", "slowest": "2 business days"},
+    "Western Union": {"fastest": "Minutes", "slowest": "3 business days"},
+    "Wise": {"fastest": "30 minutes", "slowest": "2 business days"},
+    "Xe Money Transfer": {"fastest": "1 business day", "slowest": "4 business days"},
+}
+
+# WorldRemit payOutMethodCode -> standard label
+WORLDREMIT_PAYOUT_METHODS: dict[str, str] = {
+    "BNK": "Bank Transfer",
+    "CSH": "Cash Pickup",
+    "MOB": "Mobile Money Transfer",
+    "WLT": "Wallet Transfer",
+}
+
+# Remitly pay_out_method -> standard label
+REMITLY_PAYOUT_METHODS: dict[str, str] = {
+    "BANK_DEPOSIT": "Bank Transfer",
+    "CASH_PICKUP": "Cash Pickup",
+    "DIRECT_TO_PHONE": "Mobile Money Transfer",
+}

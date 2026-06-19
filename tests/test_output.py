@@ -37,12 +37,27 @@ def test_write_all_outputs(tmp_path: Path, monkeypatch):
     import output as output_module
 
     monkeypatch.setattr(output_module, "DATA_DIR", tmp_path)
-    paths = write_all_outputs(_sample_result(), send_amount=1000.0)
+    monkeypatch.setattr(
+        output_module,
+        "fetch_aud_npr_transfer_methods",
+        lambda **kwargs: {
+            "from_currency": "AUD",
+            "to_currency": "NPR",
+            "send_amount": 1000.0,
+            "rows": [],
+            "errors": [],
+        },
+    )
+    paths = write_all_outputs(
+        _sample_result(), send_amount=1000.0, skip_browser=True
+    )
 
     assert paths["latest_json"].exists()
     assert paths["csv"].exists()
     assert paths["snapshot_json"].exists()
+    assert paths["aud_npr_methods"].exists()
 
     with paths["latest_json"].open() as fh:
         data = json.load(fh)
     assert data["all_rates"][0]["provider"] == "Wise"
+    assert "aud_npr_transfer_methods" in data

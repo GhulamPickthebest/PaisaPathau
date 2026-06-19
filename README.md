@@ -69,6 +69,15 @@ After each cycle, files are written to `data/`:
 
 Snapshots older than **3 days** are deleted automatically after each run. `latest_rates.json` is always kept.
 
+### AUD → NPR transfer method matrix
+
+`data/aud_npr_transfer_methods.json` includes per-provider rows for:
+
+- Bank Transfer, Cash Pickup, Mobile Money Transfer, Wallet Transfer
+- Fee, new/existing user rates, min/max amount (when API exposes them), transfer speeds
+
+Also embedded in `latest_rates.json` under `aud_npr_transfer_methods`.
+
 ### JSON API Endpoint
 
 Configure GitHub Pages to serve the `/data` folder. Your WordPress frontend fetches:

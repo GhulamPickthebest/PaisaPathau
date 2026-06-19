@@ -116,7 +116,7 @@ def run_fetch_cycle(
     result = PipelineResult(all_rates=all_records, errors=all_errors)
 
     insert_rates(all_records)
-    write_all_outputs(result, amount)
+    write_all_outputs(result, amount, skip_browser=skip_browser)
     cleanup_old_snapshots()
 
     total_attempts = len(all_records)

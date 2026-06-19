@@ -114,3 +114,24 @@ class PipelineResult:
     @property
     def unique_corridors(self) -> set[str]:
         return {r.from_currency for r in self.all_rates if r.status == "ok"}
+
+
+@dataclass
+class TransferMethodRow:
+    provider: str
+    transfer_method: str
+    fee: float | None
+    new_user_rate: float | None
+    existing_user_rate: float | None
+    min_amount: float | None
+    max_amount: float | None
+    fastest_speed: str
+    slowest_speed: str
+    send_amount: float
+    status: Literal["ok", "unavailable", "error"] = "ok"
+    receive_amount_new: float | None = None
+    receive_amount_existing: float | None = None
+    notes: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
