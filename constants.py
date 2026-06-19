@@ -192,15 +192,16 @@ PROVIDER_TRANSFER_SPEEDS: dict[str, dict[str, str]] = {
     "Xe Money Transfer": {"fastest": "1 business day", "slowest": "4 business days"},
 }
 
-# WorldRemit payOutMethodCode -> standard label
+# WorldRemit payOutMethodCode -> standard label (NPR from AU)
 WORLDREMIT_PAYOUT_METHODS: dict[str, str] = {
     "BNK": "Bank Transfer",
     "CSH": "Cash Pickup",
     "MOB": "Mobile Money Transfer",
-    "WLT": "Wallet Transfer",
 }
 
-# Remitly pay_out_method -> standard label
+# WorldRemit MOB (Khalti) also satisfies wallet delivery for NPR
+WORLDREMIT_WALLET_ALIAS_CODE = "MOB"
+
 REMITLY_PAYOUT_METHODS: dict[str, str] = {
     "BANK_DEPOSIT": "Bank Transfer",
     "CASH_PICKUP": "Cash Pickup",
