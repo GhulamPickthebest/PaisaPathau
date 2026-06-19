@@ -5,7 +5,7 @@ from __future__ import annotations
 import requests
 
 from config import settings
-from constants import WISE_CORRIDORS
+from constants import ACTIVE_SEND_CURRENCIES
 from models import RateRecord, utc_now_iso
 from tier_a.base import BaseApiScraper
 from utils import logger, retry
@@ -45,7 +45,7 @@ class WiseScraper(BaseApiScraper):
 
     def fetch_all(self) -> list[RateRecord]:
         records: list[RateRecord] = []
-        for currency in WISE_CORRIDORS:
+        for currency in ACTIVE_SEND_CURRENCIES:
             try:
                 records.append(self.fetch_corridor(currency))
                 logger.info("Wise %s -> NPR: ok", currency)

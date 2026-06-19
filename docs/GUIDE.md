@@ -12,9 +12,9 @@ main.py --once
     ▼
 scheduler.run_fetch_cycle()
     │
-    ├── Tier A (APIs)          → Wise, ExchangeRate-API, Open Exchange Rates
-    ├── Tier B (API + Playwright) → Remitly, WorldRemit, Instarem (API); WU, Xe (browser)
-    └── Tier C (Mid-market)    → 18 extra currencies via Wise fallback chain
+    ├── Tier A (APIs)          → Wise, ExchangeRate-API, Open Exchange Rates (AUD only)
+    ├── Tier B (API + Playwright) → Remitly, WorldRemit, Instarem (API); Western Union (browser)
+    └── Tier C (Mid-market)    → Skipped (AUD-only scope; re-enable via constants.py)
     │
     ▼
 storage.py  → SQLite history (data/rates_history.db)
@@ -126,18 +126,15 @@ fetch('https://YOUR_USERNAME.github.io/REPO-NAME/data/latest_rates.json')
 
 ---
 
-## Tier B status
+## Tier B status (AUD→NPR only)
 
 | Provider | Method | Status |
 |----------|--------|--------|
-| WorldRemit | GraphQL API | 5/6 corridors (CAD unavailable); New + Existing user rates |
-| Instarem | REST API | AUD, GBP, SGD; New + Existing user rates/fees |
-| Remitly | Calculator API | All 7 corridors; New + Existing user rates |
-| Western Union | Playwright calculator | AUD only; New + Existing user rates |
-| Xe | Playwright (`xe.com/currencyconverter`) | All corridors |
-| Xoom | — | Skipped (sign-in required) |
-| MoneyGram | — | Skipped (captcha / bot block) |
-| OFX, OrbitRemit, TorFX | — | Skipped (no public API / Cloudflare) |
+| Remitly | Calculator API | AUD; New + Existing user rates |
+| WorldRemit | GraphQL API | AUD; New + Existing user rates |
+| Instarem | REST API | AUD; New + Existing user rates/fees |
+| Western Union | Playwright send-flow estimate | AUD; per-method Bank/Cash rates + promo existing rate on bank |
+| Xoom, MoneyGram, Xe, OFX, OrbitRemit, TorFX | — | Not in active pipeline (add corridors in `constants.py` later) |
 
 Test API scrapers: `python scripts/test_tier_b.py --api-only`
 
@@ -147,11 +144,15 @@ Full browser run (WU AUD + Xe): `python main.py --once` (~5–10 min)
 
 | Tier | Source | Providers |
 |------|--------|-------------|
-| A | REST APIs | Wise, ExchangeRate-API, Open Exchange Rates |
-| B | API + Playwright | Remitly, WorldRemit, Instarem (API); Western Union, Xe (browser); Xoom, MoneyGram, OFX, OrbitRemit, TorFX (skipped) |
-| C | API fallback | Mid-market rates for QAR, SAR, KWD, MYR, JPY, etc. |
+| A | REST APIs | Wise, ExchangeRate-API, Open Exchange Rates (AUD→NPR) |
+| B | API + Playwright | Remitly, WorldRemit, Instarem (API); Western Union (browser) |
+| C | API fallback | Disabled (set `TIER_C_CURRENCIES` in `constants.py` when expanding) |
 
-Default send amount: **1000** (configurable via `SEND_AMOUNT` in `.env` or `--send-amount` flag).
+Default send amount: **1000 AUD** (configurable via `SEND_AMOUNT` in `.env` or `--send-amount` flag).
+
+### Expanding to more send currencies
+
+Edit `ACTIVE_SEND_CURRENCIES` in `constants.py` and re-enable providers in `tier_b/__init__.py` as needed.
 
 ### New vs existing user rates
 
@@ -163,6 +164,22 @@ Providers that offer different pricing return **two records** per corridor:
 | `rate_label` | `"New User"` or `"Existing User"` |
 
 Filter in WordPress by `rate_label` or `customer_type`. Providers without a split leave both fields empty.
+
+### AUD→NPR transfer method matrix — provider coverage
+
+| Provider | Bank | Cash | Mobile / Wallet | New vs existing rates | Why others are limited |
+|----------|------|------|-----------------|----------------------|-------------------------|
+| Remitly | Yes | Yes | Yes (Direct to phone) | Yes (dual API: `strict_promo`) | Fully covered via public calculator API |
+| WorldRemit | Yes | Yes | Yes (MOB / Khalti wallet alias) | Yes (`crossedOutValue` when present) | Fully covered via GraphQL |
+| Instarem | Yes | — | — | Same FX, different fees | Public API only exposes bank transfer for NPR |
+| Wise | Yes | — | — | No split on public endpoint | Comparison API returns bank quote only |
+| Western Union | Yes | Yes | Not offered online for NPR | Bank: promo ratio from landing page; Cash: same FX, higher fee | Per-method needs Playwright send-flow (no public REST API); mobile not in payout list |
+| MoneyGram | — | — | — | — | Calculator API returns 403 / captcha |
+| Xoom | — | — | — | — | Requires sign-in; no guest quote |
+| Xe | — | — | — | — | Currency converter only, not send-money quotes |
+| OFX, OrbitRemit, TorFX | — | — | — | — | Cloudflare / no public quote API |
+
+Min/max send limits are mostly **not** exposed on public endpoints (Instarem min is the exception).
 
 ---
 

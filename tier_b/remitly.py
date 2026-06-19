@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from urllib.parse import quote
 
-from constants import REMITLY_LOCALE
+from constants import REMITLY_LOCALE, active_corridors
 from models import RateRecord
 from tier_b.calculator_api import CalculatorApiScraper
 
@@ -24,7 +24,7 @@ REMITLY_API = "https://api.remitly.io/v3/calculator/estimate"
 
 class RemitlyScraper(CalculatorApiScraper):
     provider_name = "Remitly"
-    corridors = list(REMITLY_LOCALE.keys())
+    corridors = active_corridors(REMITLY_LOCALE)
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         return self.fetch_corridor_records(from_currency)[0]

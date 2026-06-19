@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from constants import WU_LOCALE
+from constants import WU_LOCALE, active_corridors
 from models import RateRecord
 from tier_b.base import BaseBrowserScraper
 from utils import PermanentScraperError, retry
@@ -25,7 +25,7 @@ PROMO_HTML_PAIR_PATTERN = re.compile(
 
 class WesternUnionScraper(BaseBrowserScraper):
     provider_name = "Western Union"
-    corridors = list(WU_LOCALE.keys())
+    corridors = active_corridors(WU_LOCALE)
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         return self.fetch_corridor_records(from_currency)[0]

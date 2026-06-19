@@ -5,7 +5,7 @@ from __future__ import annotations
 import requests
 
 from config import settings
-from constants import TIER_C_CURRENCIES, WISE_CORRIDORS
+from constants import ACTIVE_SEND_CURRENCIES
 from models import RateRecord, utc_now_iso
 from tier_a.base import BaseApiScraper
 from utils import logger, retry
@@ -59,7 +59,7 @@ class ExchangeRateApiScraper(BaseApiScraper):
             logger.warning("ExchangeRate-API key missing; skipping")
             return []
 
-        currencies = sorted(set(WISE_CORRIDORS + TIER_C_CURRENCIES))
+        currencies = list(ACTIVE_SEND_CURRENCIES)
         records: list[RateRecord] = []
         for currency in currencies:
             try:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from constants import INSTAREM_LOCALE
+from constants import INSTAREM_LOCALE, active_corridors
 from models import RateRecord
 from tier_b.calculator_api import CalculatorApiScraper
 
@@ -18,7 +18,7 @@ COMPUTED_URL = "https://www.instarem.com/api/v1/public/transaction/computed-valu
 
 class InstaremScraper(CalculatorApiScraper):
     provider_name = "Instarem"
-    corridors = list(INSTAREM_LOCALE.keys())
+    corridors = active_corridors(INSTAREM_LOCALE)
 
     def __init__(self, send_amount=None, browser=None, **_kwargs) -> None:
         super().__init__(send_amount=send_amount, browser=browser)

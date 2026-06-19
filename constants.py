@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+# Active scrape scope — expand this list when adding corridors later.
+ACTIVE_SEND_CURRENCIES: list[str] = ["AUD"]
+TARGET_CURRENCY = "NPR"
+
+
+def active_corridors(source: list[str] | dict[str, str]) -> list[str]:
+    """Return send currencies from *source* that are in ACTIVE_SEND_CURRENCIES."""
+    keys = list(source.keys()) if isinstance(source, dict) else list(source)
+    return [currency for currency in keys if currency in ACTIVE_SEND_CURRENCIES]
+
 # ISO currency -> display metadata
 CURRENCY_META: dict[str, dict[str, str]] = {
     "AUD": {"country": "Australia", "flag": "🇦🇺"},
@@ -110,69 +120,19 @@ TORFX_LOCALE: dict[str, str] = {
     "NZD": "nz",
 }
 
-# Tier B provider corridor lists
+# Tier B provider corridor lists (AUD→NPR only for now)
 TIER_B_CORRIDORS: dict[str, list[str]] = {
-    "Remitly": ["AUD", "USD", "GBP", "CAD", "NZD", "EUR", "AED"],
-    "Western Union": ["AUD", "USD", "GBP", "CAD", "NZD", "SAR", "AED"],
-    "WorldRemit": ["AUD", "USD", "GBP", "CAD", "NZD", "EUR"],
-    "Xoom": ["USD", "GBP", "CAD", "EUR"],
-    "MoneyGram": ["AUD", "USD", "GBP", "CAD"],
-    "Xe Money Transfer": ["AUD", "USD", "GBP", "CAD", "NZD"],
-    "Instarem": ["AUD", "SGD", "GBP"],
-    "OFX": ["AUD", "USD", "GBP", "CAD", "NZD"],
-    "OrbitRemit": ["AUD", "NZD", "GBP"],
-    "TorFX": ["AUD", "GBP", "NZD"],
+    "Remitly": ["AUD"],
+    "Western Union": ["AUD"],
+    "WorldRemit": ["AUD"],
+    "Instarem": ["AUD"],
 }
 
-# Tier C: mid-market only (no remittance fee data)
-TIER_C_CURRENCIES: list[str] = [
-    "QAR",
-    "SAR",
-    "KWD",
-    "BHD",
-    "OMR",
-    "MYR",
-    "JPY",
-    "KRW",
-    "SGD",
-    "HKD",
-    "INR",
-    "ILS",
-    "CHF",
-    "NOK",
-    "SEK",
-    "DKK",
-    "THB",
-    "EUR",
-]
+# Tier C: extra mid-market currencies (disabled while scoped to AUD only)
+TIER_C_CURRENCIES: list[str] = []
 
-# Tier A Wise corridors (all supported send currencies)
-WISE_CORRIDORS: list[str] = [
-    "AUD",
-    "USD",
-    "GBP",
-    "CAD",
-    "NZD",
-    "EUR",
-    "AED",
-    "SAR",
-    "SGD",
-    "QAR",
-    "KWD",
-    "BHD",
-    "OMR",
-    "MYR",
-    "JPY",
-    "KRW",
-    "HKD",
-    "INR",
-    "ILS",
-    "CHF",
-    "NOK",
-    "SEK",
-    "DKK",
-    "THB",
-]
+# Tier A Wise corridors
+WISE_CORRIDORS: list[str] = list(ACTIVE_SEND_CURRENCIES)
 
 # Standard transfer method labels (AUD/NPR matrix)
 STANDARD_TRANSFER_METHODS: list[str] = [

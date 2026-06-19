@@ -1,4 +1,4 @@
-"""Tier B: remittance provider scrapers."""
+"""Tier B: remittance provider scrapers (AUD→NPR scope)."""
 
 from tier_b.remitly import RemitlyScraper
 from tier_b.worldremit import WorldRemitScraper
@@ -18,15 +18,9 @@ API_SCRAPERS = [
     InstaremScraper,
 ]
 
-# Playwright-based scrapers
+# Playwright scrapers active for AUD→NPR
 BROWSER_SCRAPERS = [
     WesternUnionScraper,
-    XeScraper,
-    XoomScraper,
-    MoneyGramScraper,
-    OfxScraper,
-    OrbitRemitScraper,
-    TorFxScraper,
 ]
 
 ALL_BROWSER_SCRAPERS = API_SCRAPERS + BROWSER_SCRAPERS

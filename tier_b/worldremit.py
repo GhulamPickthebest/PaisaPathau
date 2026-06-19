@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from constants import WORLDREMIT_LOCALE
+from constants import WORLDREMIT_LOCALE, active_corridors
 from models import RateRecord
 from tier_b.calculator_api import CalculatorApiScraper
 
@@ -49,7 +49,7 @@ mutation createCalculation(
 
 class WorldRemitScraper(CalculatorApiScraper):
     provider_name = "WorldRemit"
-    corridors = list(WORLDREMIT_LOCALE.keys())
+    corridors = active_corridors(WORLDREMIT_LOCALE)
     GQL_URL = "https://api.worldremit.com/graphql"
 
     def __init__(self, send_amount=None, browser=None, **_kwargs) -> None:

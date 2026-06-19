@@ -16,7 +16,7 @@ from constants import (
     WORLDREMIT_WALLET_ALIAS_CODE,
 )
 from models import TransferMethodRow, utc_now_iso
-from tier_b.western_union import WesternUnionScraper
+from tier_b.western_union_transfer_methods import WesternUnionTransferMethodsScraper
 from tier_b.worldremit import CREATE_CALCULATION, WORLDREMIT_COUNTRY
 from utils import logger
 
@@ -438,36 +438,26 @@ def _fetch_wise_rows(amount: float) -> list[TransferMethodRow]:
 
 
 def _fetch_western_union_rows(amount: float) -> list[TransferMethodRow]:
-    scraper = WesternUnionScraper(send_amount=amount)
-    records = scraper.fetch_corridor_records("AUD")
-    by_type = {r.customer_type: r for r in records if r.status == "ok"}
-    new_rec = by_type.get("new_user")
-    existing_rec = by_type.get("existing_user")
-    if not new_rec:
-        raise ValueError("Western Union AUD quote unavailable")
-
-    fastest, slowest = _speeds("Western Union")
-    methods = ["Bank Transfer", "Cash Pickup", "Mobile Money Transfer"]
+    quotes = WesternUnionTransferMethodsScraper(send_amount=amount).fetch_method_quotes(
+        amount
+    )
     rows: list[TransferMethodRow] = []
-    for label in methods:
+    for quote in quotes:
         rows.append(
             TransferMethodRow(
                 provider="Western Union",
-                transfer_method=label,
-                fee=new_rec.fee,
-                new_user_rate=new_rec.exchange_rate,
-                existing_user_rate=existing_rec.exchange_rate if existing_rec else None,
+                transfer_method=quote["transfer_method"],
+                fee=quote["fee"],
+                new_user_rate=quote["new_user_rate"],
+                existing_user_rate=quote["existing_user_rate"],
                 min_amount=None,
                 max_amount=None,
-                fastest_speed=fastest,
-                slowest_speed=slowest,
+                fastest_speed=quote["fastest_speed"],
+                slowest_speed=quote["slowest_speed"],
                 send_amount=amount,
-                receive_amount_new=new_rec.receive_amount,
-                receive_amount_existing=existing_rec.receive_amount if existing_rec else None,
-                notes=(
-                    "Landing-page calculator promo rate; per-method breakdown requires "
-                    "full logged-in send flow (not on public API)"
-                ),
+                receive_amount_new=quote["receive_amount_new"],
+                receive_amount_existing=quote["receive_amount_existing"],
+                notes=quote["notes"],
             )
         )
     logger.info("Western Union AUD/NPR transfer methods: %s rows", len(rows))

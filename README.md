@@ -1,6 +1,6 @@
 # PaisaPathau Remittance Rate Scraper
 
-Production-grade Python pipeline that collects live exchange rates and transfer fees from remittance providers for **PaisaPathau.com** — a Nepal (NPR) remittance comparison site.
+Production-grade Python pipeline that collects live exchange rates and transfer fees from remittance providers for **PaisaPathau.com** — currently scoped to **AUD→NPR** (expandable later).
 
 ## Quick Guide
 
@@ -8,9 +8,9 @@ See **[docs/GUIDE.md](docs/GUIDE.md)** for setup, API keys, run commands, and pi
 
 ## Features
 
-- **Tier A** — Official APIs: Wise, ExchangeRate-API, Open Exchange Rates
-- **Tier B** — Playwright browser scrapers: Remitly, Western Union, WorldRemit, Xoom, MoneyGram, Xe, Instarem, OFX, OrbitRemit, TorFX
-- **Tier C** — Mid-market reference rates for 18 additional currencies
+- **Tier A** — Official APIs: Wise, ExchangeRate-API, Open Exchange Rates (AUD reference rates)
+- **Tier B** — Remitly, WorldRemit, Instarem (API) + Western Union (Playwright send-flow)
+- **Tier C** — Disabled while scoped to AUD only (re-enable when adding more send currencies)
 - Runs every **30 minutes** via GitHub Actions (or continuously on Railway/Render)
 - Outputs JSON, CSV, and SQLite history for trend analysis
 - Serves JSON via **GitHub Pages** for WordPress frontend consumption
