@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-20T10:41:55+00:00",
+  "last_updated": "2026-06-20T11:42:10+00:00",
   "from_currency": "AUD",
   "to_currency": "NPR",
   "send_amount": 1000.0,
@@ -10,6 +10,22 @@
     "Wallet Transfer"
   ],
   "rows": [
+    {
+      "provider": "Wise",
+      "transfer_method": "Bank Transfer",
+      "fee": 16.28,
+      "new_user_rate": 105.84,
+      "existing_user_rate": 105.84,
+      "min_amount": null,
+      "max_amount": null,
+      "fastest_speed": "30 minutes",
+      "slowest_speed": "30 minutes",
+      "send_amount": 1000.0,
+      "status": "ok",
+      "receive_amount_new": 104117.0,
+      "receive_amount_existing": 104117.0,
+      "notes": "Wise public transfer quote; no new/existing rate split on this endpoint"
+    },
     {
       "provider": "Remitly",
       "transfer_method": "Bank Transfer",
@@ -57,6 +73,22 @@
       "receive_amount_new": 107200.0,
       "receive_amount_existing": 105100.0,
       "notes": "Rates from Remitly calculator API (strict_promo new/existing calls)"
+    },
+    {
+      "provider": "Instarem",
+      "transfer_method": "Bank Transfer",
+      "fee": 0.0,
+      "new_user_rate": 105.803,
+      "existing_user_rate": 105.803,
+      "min_amount": 1.0,
+      "max_amount": null,
+      "fastest_speed": "Same day",
+      "slowest_speed": "2 business days",
+      "send_amount": 1000.0,
+      "status": "ok",
+      "receive_amount_new": 105750.1,
+      "receive_amount_existing": 104797.87,
+      "notes": "Same FX; existing user pays regular fee (from computed-value API)"
     },
     {
       "provider": "WorldRemit",
@@ -121,38 +153,6 @@
       "receive_amount_new": 104796.0,
       "receive_amount_existing": 104796.0,
       "notes": "Khalti wallet via WorldRemit MOB. No promotional spread on this payout method (same rate for all users)"
-    },
-    {
-      "provider": "Instarem",
-      "transfer_method": "Bank Transfer",
-      "fee": 0.0,
-      "new_user_rate": 105.803,
-      "existing_user_rate": 105.803,
-      "min_amount": 1.0,
-      "max_amount": null,
-      "fastest_speed": "Same day",
-      "slowest_speed": "2 business days",
-      "send_amount": 1000.0,
-      "status": "ok",
-      "receive_amount_new": 105750.1,
-      "receive_amount_existing": 104797.87,
-      "notes": "Same FX; existing user pays regular fee (from computed-value API)"
-    },
-    {
-      "provider": "Wise",
-      "transfer_method": "Bank Transfer",
-      "fee": 16.28,
-      "new_user_rate": 105.84,
-      "existing_user_rate": 105.84,
-      "min_amount": null,
-      "max_amount": null,
-      "fastest_speed": "29 minutes",
-      "slowest_speed": "29 minutes",
-      "send_amount": 1000.0,
-      "status": "ok",
-      "receive_amount_new": 104117.0,
-      "receive_amount_existing": 104117.0,
-      "notes": "Wise public transfer quote; no new/existing rate split on this endpoint"
     },
     {
       "provider": "Remitly",
