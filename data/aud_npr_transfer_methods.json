@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-20T11:55:42+00:00",
+  "last_updated": "2026-06-20T12:37:51+00:00",
   "from_currency": "AUD",
   "to_currency": "NPR",
   "send_amount": 1000.0,
@@ -18,8 +18,8 @@
       "existing_user_rate": 105.84,
       "min_amount": null,
       "max_amount": null,
-      "fastest_speed": "29 minutes",
-      "slowest_speed": "29 minutes",
+      "fastest_speed": "30 minutes",
+      "slowest_speed": "30 minutes",
       "send_amount": 1000.0,
       "status": "ok",
       "receive_amount_new": 104117.0,
@@ -30,8 +30,8 @@
       "provider": "Instarem",
       "transfer_method": "Bank Transfer",
       "fee": 0.0,
-      "new_user_rate": 105.803,
-      "existing_user_rate": 105.803,
+      "new_user_rate": 105.7501,
+      "existing_user_rate": 105.7501,
       "min_amount": 1.0,
       "max_amount": null,
       "fastest_speed": "Same day",
@@ -39,8 +39,8 @@
       "send_amount": 1000.0,
       "status": "ok",
       "receive_amount_new": 105750.1,
-      "receive_amount_existing": 104797.87,
-      "notes": "Same FX; existing user pays regular fee (from computed-value API)"
+      "receive_amount_existing": 104745.47,
+      "notes": "Applied FX (instarem_fx_rate); existing user pays regular fee"
     },
     {
       "provider": "WorldRemit",
@@ -332,7 +332,7 @@
     }
   ],
   "errors": [
-    "_fetch_remitly_rows: 429 Client Error: Too Many Requests for url: https://api.remitly.io/v3/calculator/estimate?conduit=AUS%3AAUD-NPL%3ANPR&anchor=SEND&amount=1000&purpose=OTHER&customer_segment=STANDARD&customer_recognition=UNRECOGNIZED&strict_promo=true",
+    "_fetch_remitly_rows: 429 Client Error: Too Many Requests for url: https://api.remitly.io/v3/calculator/estimate?conduit=AUS%3AAUD-NPL%3ANPR&anchor=SEND&amount=1000&purpose=OTHER&customer_segment=STANDARD&customer_recognition=UNRECOGNIZED&strict_promo=false",
     "western_union: Western Union send-flow calculator did not load"
   ]
 }
