@@ -94,6 +94,20 @@ def write_aud_npr_transfer_methods(
     return path
 
 
+def write_all_outputs_from_payload(
+    result: PipelineResult,
+    payload: dict,
+    send_amount: float,
+) -> dict[str, Path]:
+    transfer_matrix = payload.get("aud_npr_transfer_methods") or {}
+    return {
+        "latest_json": write_latest_json(payload),
+        "snapshot_json": write_snapshot_json(payload),
+        "csv": write_csv(result.all_rates),
+        "aud_npr_methods": write_aud_npr_transfer_methods(transfer_matrix),
+    }
+
+
 def write_all_outputs(
     result: PipelineResult,
     send_amount: float,
@@ -104,9 +118,4 @@ def write_all_outputs(
         skip_browser=skip_browser,
     )
     payload = build_output_payload(result, send_amount, transfer_matrix)
-    return {
-        "latest_json": write_latest_json(payload),
-        "snapshot_json": write_snapshot_json(payload),
-        "csv": write_csv(result.all_rates),
-        "aud_npr_methods": write_aud_npr_transfer_methods(transfer_matrix),
-    }
+    return write_all_outputs_from_payload(result, payload, send_amount)

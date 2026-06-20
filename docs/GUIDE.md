@@ -51,6 +51,7 @@ Edit `.env` with your keys (see below).
 |---------|----------|
 | `python main.py --once` | Single full scrape (CI mode) |
 | `python main.py --once --skip-browser` | APIs only (~25 sec, good for testing) |
+| `python main.py --serve` | **Live API** — fetch providers on each request (~10 sec) |
 | `python main.py` | Continuous loop every 30 min |
 | `python main.py --interval 15` | Custom interval (minutes) |
 | `pytest tests/ -v` | Run unit tests |
@@ -58,6 +59,50 @@ Edit `.env` with your keys (see below).
 | `python scripts/test_tier_b.py --provider Remitly` | Test one provider |
 
 Logs: `logs/scraper.log`
+
+---
+
+## Live API (real-time rates for WordPress)
+
+GitHub Pages serves **static** JSON (updated every 30 min). For rates that match provider websites **now**, run the live API on a small host (Railway, Render, Fly.io):
+
+```bash
+python main.py --serve
+# → http://localhost:8000/data/latest_rates.json
+```
+
+| Endpoint | Same shape as |
+|----------|----------------|
+| `GET /data/latest_rates.json` | GitHub Pages JSON |
+| `GET /data/aud_npr_transfer_methods.json` | Transfer method matrix |
+| `GET /health` | Health check |
+
+**Query params**
+
+| Param | Default | Description |
+|-------|---------|-------------|
+| `send_amount` | 1000 | AUD send amount |
+| `skip_browser` | `true` | `false` includes Western Union (~2 min response) |
+| `fresh=true` | off | Bypass 120s cache, hit providers immediately |
+
+**WordPress:** point your backend fetch to the live API URL instead of GitHub Pages:
+
+```javascript
+fetch('https://YOUR-API.railway.app/data/latest_rates.json')
+```
+
+Keep GitHub Pages as a **fallback** if the API is down.
+
+**.env**
+
+```
+API_PORT=8000
+LIVE_API_CACHE_SECONDS=120   # avoids Remitly 429 when many visitors load at once
+LIVE_API_SKIP_BROWSER=true  # fast mode; set false for full WU per-method data
+LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
+```
+
+Response includes `"fetch_mode": "live"` and `"cached": true/false`.
 
 ---
 

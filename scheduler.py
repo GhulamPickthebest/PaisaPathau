@@ -10,8 +10,9 @@ from cleanup import cleanup_old_snapshots
 from config import settings
 from constants import ACTIVE_SEND_CURRENCIES, TIER_C_CURRENCIES
 from models import PipelineResult, RateRecord
-from output import write_all_outputs
+from output import build_output_payload, write_all_outputs_from_payload
 from storage import insert_rates
+from transfer_methods.aud_npr import fetch_aud_npr_transfer_methods
 from tier_a.exchangerate_api import ExchangeRateApiScraper
 from tier_a.open_exchange_rates import OpenExchangeRatesScraper
 from tier_a.wise import WiseScraper
@@ -108,6 +109,55 @@ def run_fetch_cycle(
     amount = send_amount or settings.send_amount
     logger.info("Starting fetch cycle (send_amount=%s)", amount)
 
+    result, payload = _fetch_and_build_payload(amount, skip_browser=skip_browser)
+
+    insert_rates(result.all_rates)
+    write_all_outputs_from_payload(result, payload, amount)
+    cleanup_old_snapshots()
+
+    total_attempts = len(result.all_rates)
+    alert_on_high_failure_rate(
+        total_attempts,
+        len(result.ok_rates),
+        result.errors,
+    )
+
+    ok = len(result.ok_rates)
+    logger.info(
+        "Fetch cycle complete: %s ok / %s total records, %s errors",
+        ok,
+        total_attempts,
+        len(result.errors),
+    )
+    return result
+
+
+def fetch_live_payload(
+    send_amount: float | None = None,
+    skip_browser: bool | None = None,
+) -> dict:
+    """Fetch current provider rates and return JSON payload (no file/DB writes)."""
+    amount = send_amount or settings.send_amount
+    browser_skipped = (
+        settings.live_api_skip_browser if skip_browser is None else skip_browser
+    )
+    logger.info(
+        "Live fetch (send_amount=%s, skip_browser=%s)",
+        amount,
+        browser_skipped,
+    )
+    _result, payload = _fetch_and_build_payload(
+        amount, skip_browser=browser_skipped
+    )
+    payload["fetch_mode"] = "live"
+    payload["skip_browser"] = browser_skipped
+    return payload
+
+
+def _fetch_and_build_payload(
+    amount: float,
+    skip_browser: bool,
+) -> tuple[PipelineResult, dict]:
     all_records: list[RateRecord] = []
     all_errors: list[str] = []
 
@@ -121,26 +171,14 @@ def run_fetch_cycle(
         all_errors.extend(errors)
 
     result = PipelineResult(all_rates=all_records, errors=all_errors)
-
-    insert_rates(all_records)
-    write_all_outputs(result, amount, skip_browser=skip_browser)
-    cleanup_old_snapshots()
-
-    total_attempts = len(all_records)
-    alert_on_high_failure_rate(
-        total_attempts,
-        len(result.ok_rates),
-        all_errors,
+    transfer_matrix = fetch_aud_npr_transfer_methods(
+        send_amount=amount,
+        skip_browser=skip_browser,
     )
-
-    ok = len(result.ok_rates)
-    logger.info(
-        "Fetch cycle complete: %s ok / %s total records, %s errors",
-        ok,
-        total_attempts,
-        len(all_errors),
-    )
-    return result
+    payload = build_output_payload(result, amount, transfer_matrix)
+    if all_errors:
+        payload["errors"] = all_errors
+    return result, payload
 
 
 def run_scheduler(

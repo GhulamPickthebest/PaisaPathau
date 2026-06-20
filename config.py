@@ -27,6 +27,10 @@ class Settings:
     retry_delay_seconds: float
     log_level: str
     log_file: str
+    api_port: int
+    live_api_cache_seconds: int
+    live_api_skip_browser: bool
+    live_api_cors_origins: str
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -42,6 +46,11 @@ class Settings:
             retry_delay_seconds=float(os.getenv("RETRY_DELAY_SECONDS", "2")),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             log_file=os.getenv("LOG_FILE", str(LOGS_DIR / "scraper.log")),
+            api_port=int(os.getenv("API_PORT", "8000")),
+            live_api_cache_seconds=int(os.getenv("LIVE_API_CACHE_SECONDS", "120")),
+            live_api_skip_browser=os.getenv("LIVE_API_SKIP_BROWSER", "true").lower()
+            == "true",
+            live_api_cors_origins=os.getenv("LIVE_API_CORS_ORIGINS", "*"),
         )
 
 

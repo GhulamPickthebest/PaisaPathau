@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from config import settings
 from scheduler import run_fetch_cycle, run_scheduler
 from utils import logger
 
@@ -18,6 +19,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--once",
         action="store_true",
         help="Run a single fetch cycle and exit (used by GitHub Actions)",
+    )
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="Start live API server (fetches provider rates on each request)",
     )
     parser.add_argument(
         "--interval",
@@ -36,6 +42,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Override default send amount (default from .env or 1000)",
     )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help="Live API port (default from API_PORT in .env)",
+    )
     return parser.parse_args(argv)
 
 
@@ -43,6 +55,24 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
 
     try:
+        if args.serve:
+            import uvicorn
+
+            port = args.port or settings.api_port
+            logger.info(
+                "Starting live API on port %s (cache=%ss, skip_browser=%s)",
+                port,
+                settings.live_api_cache_seconds,
+                settings.live_api_skip_browser,
+            )
+            uvicorn.run(
+                "live_api:app",
+                host="0.0.0.0",
+                port=port,
+                log_level=settings.log_level.lower(),
+            )
+            return 0
+
         if args.once:
             logger.info("Running single fetch cycle")
             result = run_fetch_cycle(
