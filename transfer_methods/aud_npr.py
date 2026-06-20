@@ -18,6 +18,7 @@ from constants import (
     WORLDREMIT_WALLET_ALIAS_CODE,
 )
 from models import TransferMethodRow, utc_now_iso
+from tier_b.instarem import parse_instarem_computed_payload
 from tier_b.western_union_transfer_methods import WesternUnionTransferMethodsScraper
 from tier_b.worldremit import CREATE_CALCULATION, WORLDREMIT_COUNTRY
 from utils import logger
@@ -366,11 +367,13 @@ def _fetch_instarem_rows(amount: float) -> list[TransferMethodRow]:
     cv_resp.raise_for_status()
     payload = cv_resp.json()["data"]
     cfg = payload["transaction_config"]
-    rate = float(payload["fx_rate"])
-    new_fee = float(payload.get("transaction_fee_amount") or 0)
-    existing_fee = float(payload.get("regular_transaction_fee_amount") or 0)
-    new_receive = float(payload.get("destination_amount") or 0)
-    existing_receive = round((amount - existing_fee) * rate, 2)
+    parsed = parse_instarem_computed_payload(payload, amount)
+    new_rate = parsed["new_rate"]
+    existing_rate = parsed["existing_rate"]
+    new_fee = parsed["new_fee"]
+    existing_fee = parsed["existing_fee"]
+    new_receive = parsed["new_receive"]
+    existing_receive = parsed["existing_receive"]
     min_amount = float(cfg.get("min_source_amount_limit") or 0) or None
     max_amount = float(cfg.get("max_source_amount_limit") or 0) or None
     if max_amount and max_amount > 1_000_000:
@@ -382,8 +385,8 @@ def _fetch_instarem_rows(amount: float) -> list[TransferMethodRow]:
             provider="Instarem",
             transfer_method="Bank Transfer",
             fee=new_fee,
-            new_user_rate=rate,
-            existing_user_rate=rate,
+            new_user_rate=new_rate,
+            existing_user_rate=existing_rate,
             min_amount=min_amount,
             max_amount=max_amount,
             fastest_speed=fastest,
@@ -391,7 +394,7 @@ def _fetch_instarem_rows(amount: float) -> list[TransferMethodRow]:
             send_amount=amount,
             receive_amount_new=new_receive,
             receive_amount_existing=existing_receive,
-            notes="Same FX; existing user pays regular fee (from computed-value API)",
+            notes="Applied FX (instarem_fx_rate); existing user pays regular fee",
         )
     ]
 
