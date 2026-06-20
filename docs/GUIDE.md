@@ -93,6 +93,28 @@ fetch('https://YOUR-API.railway.app/data/latest_rates.json')
 
 Keep GitHub Pages as a **fallback** if the API is down.
 
+### Railway deployment
+
+Run the **live API**, not the scheduler (`python main.py` without `--serve`).
+
+**Start command:** `python main.py --serve` (set in `railway.toml` / `Procfile`).
+
+| Wrong start command | Problem |
+|---------------------|---------|
+| `python main.py` | Scheduler loop, Playwright missing, no HTTP |
+| Playwright without `playwright install` | WU browser scrape fails |
+
+**Env vars on Railway:**
+
+```
+LIVE_API_SKIP_BROWSER=true
+LIVE_API_WARM_CACHE=true
+LIVE_API_CACHE_SECONDS=120
+EXCHANGERATE_API_KEY=your_key
+```
+
+Railway injects `PORT` — the app uses it automatically. Health check: `/health`.
+
 **.env**
 
 ```

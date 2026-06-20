@@ -96,3 +96,6 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+# Railway / uvicorn entrypoint: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+from live_api import app  # noqa: E402, F401
