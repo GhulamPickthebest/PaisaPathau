@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import threading
 import time
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, Query
@@ -14,10 +15,35 @@ from config import settings
 from scheduler import fetch_live_payload
 from utils import logger
 
+
+def _warm_cache_background() -> None:
+    try:
+        logger.info("Warming live API cache on startup...")
+        payload = fetch_live_payload()
+        _cache_set(
+            (settings.send_amount, settings.live_api_skip_browser),
+            payload,
+        )
+        logger.info(
+            "Live API cache warmed in %ss",
+            payload.get("fetch_duration_seconds", "?"),
+        )
+    except Exception as exc:
+        logger.warning("Live API cache warm-up failed: %s", exc)
+
+
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    if settings.live_api_warm_cache:
+        threading.Thread(target=_warm_cache_background, daemon=True).start()
+    yield
+
+
 app = FastAPI(
     title="PaisaPathau Live Rates API",
     description="Fetches AUD→NPR rates from providers on demand.",
     version="1.0.0",
+    lifespan=_lifespan,
 )
 
 _origins = [

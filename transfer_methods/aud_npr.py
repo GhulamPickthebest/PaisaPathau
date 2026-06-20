@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from urllib.parse import quote
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 import requests
 
 from config import settings
@@ -58,18 +60,22 @@ def fetch_aud_npr_transfer_methods(
     rows: list[TransferMethodRow] = []
     errors: list[str] = []
 
-    for fetcher in (
+    fetchers = [
         _fetch_remitly_rows,
         _fetch_worldremit_rows,
         _fetch_instarem_rows,
         _fetch_wise_rows,
-    ):
-        try:
-            rows.extend(fetcher(amount))
-        except Exception as exc:
-            msg = f"{fetcher.__name__}: {exc}"
-            logger.error("AUD/NPR transfer methods: %s", msg)
-            errors.append(msg)
+    ]
+    with ThreadPoolExecutor(max_workers=len(fetchers)) as executor:
+        futures = {executor.submit(fn, amount): fn for fn in fetchers}
+        for future in as_completed(futures):
+            fn = futures[future]
+            try:
+                rows.extend(future.result())
+            except Exception as exc:
+                msg = f"{fn.__name__}: {exc}"
+                logger.error("AUD/NPR transfer methods: %s", msg)
+                errors.append(msg)
 
     if not skip_browser:
         try:

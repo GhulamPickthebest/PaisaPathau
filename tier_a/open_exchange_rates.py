@@ -68,7 +68,7 @@ class OpenExchangeRatesScraper(BaseApiScraper):
         )
 
     def fetch_all(self) -> list[RateRecord]:
-        if not self.app_id:
+        if not self.app_id or self.app_id.startswith("your_"):
             logger.warning("Open Exchange Rates app ID missing; skipping")
             return []
 

@@ -56,15 +56,19 @@ def fetch_tier_b(send_amount: float, skip_browser: bool = False) -> tuple[list[R
     records: list[RateRecord] = []
     errors: list[str] = []
 
-    for scraper_cls in API_SCRAPERS:
-        name = scraper_cls.provider_name
-        try:
-            scraper = scraper_cls(send_amount=send_amount)
-            records.extend(scraper.fetch_all())
-        except Exception as exc:
-            msg = f"Tier B {name} failed: {exc}"
-            logger.error(msg)
-            errors.append(msg)
+    with ThreadPoolExecutor(max_workers=len(API_SCRAPERS)) as executor:
+        futures = {
+            executor.submit(scraper_cls(send_amount=send_amount).fetch_all): scraper_cls.provider_name
+            for scraper_cls in API_SCRAPERS
+        }
+        for future in as_completed(futures):
+            name = futures[future]
+            try:
+                records.extend(future.result())
+            except Exception as exc:
+                msg = f"Tier B {name} failed: {exc}"
+                logger.error(msg)
+                errors.append(msg)
 
     if api_only:
         return records, errors
@@ -137,6 +141,7 @@ def fetch_live_payload(
     skip_browser: bool | None = None,
 ) -> dict:
     """Fetch current provider rates and return JSON payload (no file/DB writes)."""
+    started = time.perf_counter()
     amount = send_amount or settings.send_amount
     browser_skipped = (
         settings.live_api_skip_browser if skip_browser is None else skip_browser
@@ -151,6 +156,7 @@ def fetch_live_payload(
     )
     payload["fetch_mode"] = "live"
     payload["skip_browser"] = browser_skipped
+    payload["fetch_duration_seconds"] = round(time.perf_counter() - started, 2)
     return payload
 
 
@@ -160,25 +166,51 @@ def _fetch_and_build_payload(
 ) -> tuple[PipelineResult, dict]:
     all_records: list[RateRecord] = []
     all_errors: list[str] = []
+    transfer_matrix: dict = {}
 
-    tier_results = [
-        fetch_tier_a(amount),
-        fetch_tier_b(amount, skip_browser=skip_browser),
-        fetch_tier_c(amount),
-    ]
-    for records, errors in tier_results:
-        all_records.extend(records)
-        all_errors.extend(errors)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        tiers_future = executor.submit(_fetch_all_tiers, amount, skip_browser)
+        matrix_future = executor.submit(
+            fetch_aud_npr_transfer_methods,
+            send_amount=amount,
+            skip_browser=skip_browser,
+        )
+        all_records, all_errors = tiers_future.result()
+        transfer_matrix = matrix_future.result()
 
     result = PipelineResult(all_rates=all_records, errors=all_errors)
-    transfer_matrix = fetch_aud_npr_transfer_methods(
-        send_amount=amount,
-        skip_browser=skip_browser,
-    )
     payload = build_output_payload(result, amount, transfer_matrix)
     if all_errors:
         payload["errors"] = all_errors
+    if transfer_matrix.get("errors"):
+        payload.setdefault("errors", []).extend(transfer_matrix["errors"])
     return result, payload
+
+
+def _fetch_all_tiers(
+    amount: float, skip_browser: bool
+) -> tuple[list[RateRecord], list[str]]:
+    all_records: list[RateRecord] = []
+    all_errors: list[str] = []
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {
+            executor.submit(fetch_tier_a, amount): "tier_a",
+            executor.submit(fetch_tier_b, amount, skip_browser): "tier_b",
+            executor.submit(fetch_tier_c, amount): "tier_c",
+        }
+        for future in as_completed(futures):
+            try:
+                records, errors = future.result()
+                all_records.extend(records)
+                all_errors.extend(errors)
+            except Exception as exc:
+                label = futures[future]
+                msg = f"{label} failed: {exc}"
+                logger.error(msg)
+                all_errors.append(msg)
+
+    return all_records, all_errors
 
 
 def run_scheduler(
