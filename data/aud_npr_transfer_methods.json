@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-21T09:15:05+00:00",
+  "last_updated": "2026-06-21T12:05:37+00:00",
   "from_currency": "AUD",
   "to_currency": "NPR",
   "send_amount": 1000.0,
@@ -18,8 +18,8 @@
       "existing_user_rate": 105.84,
       "min_amount": null,
       "max_amount": null,
-      "fastest_speed": "29 minutes",
-      "slowest_speed": "29 minutes",
+      "fastest_speed": "30 minutes",
+      "slowest_speed": "30 minutes",
       "send_amount": 1000.0,
       "status": "ok",
       "receive_amount_new": 104117.0,
