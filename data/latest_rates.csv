@@ -1,11 +1,11 @@
 provider,customer_type,rate_label,from_currency,from_country,from_flag,to_currency,send_amount,exchange_rate,fee,net_send_amount,receive_amount,transfer_speed,delivery_method,timestamp,source,status
-Wise,,,AUD,Australia,🇦🇺,NPR,1000.0,106.081,0.0,1000.0,106081.0,1-2 business days,Bank transfer,2026-06-22T14:44:13+00:00,api,ok
-ExchangeRate-API,,,AUD,Australia,🇦🇺,NPR,1000.0,105.9517,0.0,1000.0,105951.7,Mid-market,Reference rate,2026-06-22T14:44:13+00:00,api,ok
-Remitly,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.26,0.99,999.01,107260.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-22T14:44:13+00:00,scraper,ok
-Remitly,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,105.16,0.99,999.01,105160.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-22T14:44:13+00:00,scraper,ok
-WorldRemit,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.248,0.0,1000.0,107248.0,Minutes to 1 day,Bank transfer,2026-06-22T14:44:13+00:00,scraper,ok
-WorldRemit,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,104.6647,0.0,1000.0,104664.7,Minutes to 1 day,Bank transfer,2026-06-22T14:44:13+00:00,scraper,ok
-Instarem,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,106.036,0.0,1000.0,106036.0,Same day - 2 days,Bank transfer,2026-06-22T14:44:14+00:00,scraper,ok
-Instarem,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,106.036,9.5,990.5,105028.66,Same day - 2 days,Bank transfer,2026-06-22T14:44:14+00:00,scraper,ok
-Western Union,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.08061000000001,0.0,1000.0,107080.61,Minutes to days,Bank / Cash pickup / Mobile wallet,2026-06-22T14:44:31+00:00,scraper,ok
-Western Union,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,103.48301,0.0,1000.0,103483.01,Minutes to days,Bank / Cash pickup / Mobile wallet,2026-06-22T14:44:31+00:00,scraper,ok
+Wise,,,AUD,Australia,🇦🇺,NPR,1000.0,106.081,0.0,1000.0,106081.0,1-2 business days,Bank transfer,2026-06-22T18:49:51+00:00,api,ok
+ExchangeRate-API,,,AUD,Australia,🇦🇺,NPR,1000.0,105.9517,0.0,1000.0,105951.7,Mid-market,Reference rate,2026-06-22T18:49:51+00:00,api,ok
+Remitly,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.2,0.99,999.01,107200.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-22T18:49:51+00:00,scraper,ok
+Remitly,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,105.1,0.99,999.01,105100.0,Minutes to 3 business days,Bank deposit / Cash pickup,2026-06-22T18:49:51+00:00,scraper,ok
+WorldRemit,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.237,0.0,1000.0,107237.0,Minutes to 1 day,Bank transfer,2026-06-22T18:49:51+00:00,scraper,ok
+WorldRemit,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,104.654,0.0,1000.0,104654.0,Minutes to 1 day,Bank transfer,2026-06-22T18:49:51+00:00,scraper,ok
+Instarem,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,106.036,0.0,1000.0,106036.0,Same day - 2 days,Bank transfer,2026-06-22T18:49:52+00:00,scraper,ok
+Instarem,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,106.036,9.5,990.5,105028.66,Same day - 2 days,Bank transfer,2026-06-22T18:49:52+00:00,scraper,ok
+Western Union,new_user,New User,AUD,Australia,🇦🇺,NPR,1000.0,107.12651,0.0,1000.0,107126.51,Minutes to days,Bank / Cash pickup / Mobile wallet,2026-06-22T18:50:10+00:00,scraper,ok
+Western Union,existing_user,Existing User,AUD,Australia,🇦🇺,NPR,1000.0,103.52741,0.0,1000.0,103527.41,Minutes to days,Bank / Cash pickup / Mobile wallet,2026-06-22T18:50:10+00:00,scraper,ok
