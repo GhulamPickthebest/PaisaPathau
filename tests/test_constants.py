@@ -2,6 +2,7 @@
 
 from constants import (
     ACTIVE_SEND_CURRENCIES,
+    AUD_NPR_PROVIDERS,
     PROVIDER_PRIORITY,
     TIER_B_CORRIDORS,
     TIER_C_CURRENCIES,
@@ -9,13 +10,15 @@ from constants import (
 )
 
 
+def test_aud_only_scope():
+    assert ACTIVE_SEND_CURRENCIES == ["AUD"]
+    assert TIER_C_CURRENCIES == []
+
+
 def test_tier_b_corridor_matrix_matches_active_currencies():
     for provider, corridors in TIER_B_CORRIDORS.items():
         assert provider in PROVIDER_PRIORITY
-        for currency in corridors:
-            assert currency in ACTIVE_SEND_CURRENCIES, (
-                f"{provider} lists {currency} but it is not in ACTIVE_SEND_CURRENCIES"
-            )
+        assert corridors == ["AUD"], f"{provider} should be AUD-only for now"
 
 
 def test_all_tier_b_providers_registered():
@@ -31,10 +34,25 @@ def test_all_tier_b_providers_registered():
 def test_active_corridors_filters_send_currencies():
     from constants import REMITLY_LOCALE
 
-    corridors = active_corridors(REMITLY_LOCALE)
-    assert corridors == ["AUD", "USD", "GBP", "CAD", "NZD", "EUR", "AED"]
+    assert active_corridors(REMITLY_LOCALE) == ["AUD"]
 
 
-def test_tier_c_includes_gulf_and_asia_reference_currencies():
-    for currency in ("QAR", "KWD", "JPY", "EUR", "INR"):
-        assert currency in TIER_C_CURRENCIES
+def test_aud_npr_provider_list():
+    expected = {
+        "Wise",
+        "Remitly",
+        "WorldRemit",
+        "Xoom (PayPal)",
+        "MoneyGram",
+        "Western Union",
+        "Instarem",
+        "Xe Money Transfer",
+        "Skrill",
+        "Ria Money Transfer",
+        "Instarem (by Nium)",
+        "Revolut",
+        "ACE Money Transfer",
+        "LuLu Exchange",
+        "Taptap Send",
+    }
+    assert set(AUD_NPR_PROVIDERS) == expected

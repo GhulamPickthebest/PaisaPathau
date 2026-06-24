@@ -11,6 +11,7 @@ import requests
 
 from config import settings
 from constants import (
+    AUD_NPR_PROVIDERS,
     PROVIDER_TRANSFER_SPEEDS,
     REMITLY_PAYOUT_METHODS,
     STANDARD_TRANSFER_METHODS,
@@ -475,7 +476,7 @@ def _fetch_western_union_rows(amount: float) -> list[TransferMethodRow]:
 
 def _unavailable_rows(existing: list[TransferMethodRow], amount: float) -> list[TransferMethodRow]:
     covered = {(r.provider, r.transfer_method) for r in existing if r.status == "ok"}
-    providers = ["Remitly", "WorldRemit", "Instarem", "Western Union", "Wise"]
+    providers = list(AUD_NPR_PROVIDERS)
     rows: list[TransferMethodRow] = []
 
     for provider in providers:

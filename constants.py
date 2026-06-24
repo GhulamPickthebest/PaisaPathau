@@ -4,40 +4,11 @@ from __future__ import annotations
 
 TARGET_CURRENCY = "NPR"
 
-# All send currencies used by Tier B remittance providers (union of provider corridors).
-ACTIVE_SEND_CURRENCIES: list[str] = [
-    "AUD",
-    "USD",
-    "GBP",
-    "CAD",
-    "NZD",
-    "EUR",
-    "AED",
-    "SAR",
-    "SGD",
-]
+# Active scrape scope — AUD→NPR only for now (expand ACTIVE_SEND_CURRENCIES later).
+ACTIVE_SEND_CURRENCIES: list[str] = ["AUD"]
 
-# Tier C: mid-market reference rates where remittance scraping is limited/unavailable.
-TIER_C_CURRENCIES: list[str] = [
-    "QAR",
-    "SAR",
-    "KWD",
-    "BHD",
-    "OMR",
-    "MYR",
-    "JPY",
-    "KRW",
-    "SGD",
-    "HKD",
-    "INR",
-    "ILS",
-    "CHF",
-    "NOK",
-    "SEK",
-    "DKK",
-    "THB",
-    "EUR",
-]
+# Tier C disabled while scoped to AUD→NPR remittance providers only.
+TIER_C_CURRENCIES: list[str] = []
 
 
 def active_corridors(source: list[str] | dict[str, str]) -> list[str]:
@@ -75,114 +46,61 @@ CURRENCY_META: dict[str, dict[str, str]] = {
     "NPR": {"country": "Nepal", "flag": "🇳🇵"},
 }
 
-# Remitly locale path segments
-REMITLY_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-    "NZD": "nz",
-    "EUR": "de",
-    "AED": "ae",
-}
+# Provider locale maps (expand keys when adding send currencies later)
+REMITLY_LOCALE: dict[str, str] = {"AUD": "au"}
+WU_LOCALE: dict[str, str] = {"AUD": "au"}
+WORLDREMIT_LOCALE: dict[str, str] = {"AUD": "au"}
+XOOM_LOCALE: dict[str, str] = {"AUD": "au"}
+MONEYGRAM_LOCALE: dict[str, str] = {"AUD": "au"}
+XE_LOCALE: dict[str, str] = {"AUD": "au"}
+INSTAREM_LOCALE: dict[str, str] = {"AUD": "au"}
+INSTAREM_NIUM_LOCALE: dict[str, str] = {"AUD": "au"}
+WISE_TRANSFER_LOCALE: dict[str, str] = {"AUD": "au"}
+SKRILL_LOCALE: dict[str, str] = {"AUD": "au"}
+RIA_LOCALE: dict[str, str] = {"AUD": "au"}
+REVOLUT_LOCALE: dict[str, str] = {"AUD": "au"}
+ACE_LOCALE: dict[str, str] = {"AUD": "au"}
+LULU_LOCALE: dict[str, str] = {"AUD": "au"}
+TAPTAP_LOCALE: dict[str, str] = {"AUD": "au"}
 
-# Western Union country site codes
-WU_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-    "NZD": "nz",
-    "SAR": "sa",
-    "AED": "ae",
-}
-
-WORLDREMIT_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-    "NZD": "nz",
-    "EUR": "de",
-}
-
-XOOM_LOCALE: dict[str, str] = {
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-    "EUR": "de",
-}
-
-MONEYGRAM_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-}
-
-XE_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-    "NZD": "nz",
-}
-
-INSTAREM_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "SGD": "sg",
-    "GBP": "gb",
-}
-
-OFX_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "USD": "us",
-    "GBP": "gb",
-    "CAD": "ca",
-    "NZD": "nz",
-}
-
-ORBITREMIT_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "NZD": "nz",
-    "GBP": "gb",
-}
-
-TORFX_LOCALE: dict[str, str] = {
-    "AUD": "au",
-    "GBP": "gb",
-    "NZD": "nz",
-}
-
-# Provider → supported send currencies → NPR
+# Provider → supported send currencies → NPR (AUD only for now)
 TIER_B_CORRIDORS: dict[str, list[str]] = {
-    "Remitly": ["AUD", "USD", "GBP", "CAD", "NZD", "EUR", "AED"],
-    "Western Union": ["AUD", "USD", "GBP", "CAD", "NZD", "SAR", "AED"],
-    "WorldRemit": ["AUD", "USD", "GBP", "CAD", "NZD", "EUR"],
-    "Xoom": ["USD", "GBP", "CAD", "EUR"],
-    "MoneyGram": ["AUD", "USD", "GBP", "CAD"],
-    "Xe Money Transfer": ["AUD", "USD", "GBP", "CAD", "NZD"],
-    "Instarem": ["AUD", "SGD", "GBP"],
-    "OFX": ["AUD", "USD", "GBP", "CAD", "NZD"],
-    "OrbitRemit": ["AUD", "NZD", "GBP"],
-    "TorFX": ["AUD", "GBP", "NZD"],
+    "Wise": ["AUD"],
+    "Remitly": ["AUD"],
+    "WorldRemit": ["AUD"],
+    "Xoom (PayPal)": ["AUD"],
+    "MoneyGram": ["AUD"],
+    "Western Union": ["AUD"],
+    "Instarem": ["AUD"],
+    "Xe Money Transfer": ["AUD"],
+    "Skrill": ["AUD"],
+    "Ria Money Transfer": ["AUD"],
+    "Instarem (by Nium)": ["AUD"],
+    "Revolut": ["AUD"],
+    "ACE Money Transfer": ["AUD"],
+    "LuLu Exchange": ["AUD"],
+    "Taptap Send": ["AUD"],
 }
 
-# Integration priority (documentation / alerting)
 PROVIDER_PRIORITY: dict[str, str] = {
+    "Wise": "high",
     "Remitly": "high",
     "Western Union": "high",
     "WorldRemit": "high",
-    "Xoom": "medium",
+    "Xoom (PayPal)": "medium",
     "MoneyGram": "medium",
     "Xe Money Transfer": "medium",
     "Instarem": "medium",
-    "OFX": "medium",
-    "OrbitRemit": "low",
-    "TorFX": "low",
+    "Instarem (by Nium)": "medium",
+    "Skrill": "medium",
+    "Ria Money Transfer": "medium",
+    "Revolut": "medium",
+    "ACE Money Transfer": "medium",
+    "LuLu Exchange": "medium",
+    "Taptap Send": "medium",
 }
 
-# Tier A Wise corridors
+# Tier A Wise corridors (mid-market reference)
 WISE_CORRIDORS: list[str] = list(ACTIVE_SEND_CURRENCIES)
 
 # Standard transfer method labels (AUD/NPR matrix)
@@ -193,29 +111,30 @@ STANDARD_TRANSFER_METHODS: list[str] = [
     "Wallet Transfer",
 ]
 
-# Provider delivery speed ranges for NPR corridors
 PROVIDER_TRANSFER_SPEEDS: dict[str, dict[str, str]] = {
+    "Wise": {"fastest": "30 minutes", "slowest": "2 business days"},
     "Remitly": {"fastest": "Minutes", "slowest": "3 business days"},
     "WorldRemit": {"fastest": "Minutes", "slowest": "1 business day"},
     "Instarem": {"fastest": "Same day", "slowest": "2 business days"},
+    "Instarem (by Nium)": {"fastest": "Same day", "slowest": "2 business days"},
     "Western Union": {"fastest": "Minutes", "slowest": "3 business days"},
-    "Wise": {"fastest": "30 minutes", "slowest": "2 business days"},
     "Xe Money Transfer": {"fastest": "1 business day", "slowest": "4 business days"},
-    "Xoom": {"fastest": "Minutes", "slowest": "3 business days"},
+    "Xoom (PayPal)": {"fastest": "Minutes", "slowest": "3 business days"},
     "MoneyGram": {"fastest": "Minutes", "slowest": "3 business days"},
-    "OFX": {"fastest": "1 business day", "slowest": "3 business days"},
-    "OrbitRemit": {"fastest": "1 business day", "slowest": "3 business days"},
-    "TorFX": {"fastest": "1 business day", "slowest": "3 business days"},
+    "Skrill": {"fastest": "Minutes", "slowest": "3 business days"},
+    "Ria Money Transfer": {"fastest": "Minutes", "slowest": "3 business days"},
+    "Revolut": {"fastest": "Minutes", "slowest": "2 business days"},
+    "ACE Money Transfer": {"fastest": "Same day", "slowest": "3 business days"},
+    "LuLu Exchange": {"fastest": "Same day", "slowest": "2 business days"},
+    "Taptap Send": {"fastest": "Minutes", "slowest": "1 business day"},
 }
 
-# WorldRemit payOutMethodCode -> standard label (NPR from AU)
 WORLDREMIT_PAYOUT_METHODS: dict[str, str] = {
     "BNK": "Bank Transfer",
     "CSH": "Cash Pickup",
     "MOB": "Mobile Money Transfer",
 }
 
-# WorldRemit MOB (Khalti) also satisfies wallet delivery for NPR
 WORLDREMIT_WALLET_ALIAS_CODE = "MOB"
 
 REMITLY_PAYOUT_METHODS: dict[str, str] = {
@@ -223,3 +142,6 @@ REMITLY_PAYOUT_METHODS: dict[str, str] = {
     "CASH_PICKUP": "Cash Pickup",
     "DIRECT_TO_PHONE": "Mobile Money Transfer",
 }
+
+# All remittance providers shown in AUD→NPR comparisons
+AUD_NPR_PROVIDERS: list[str] = list(TIER_B_CORRIDORS.keys())

@@ -9,10 +9,10 @@ from utils import PermanentScraperError
 
 
 class XoomScraper(BaseBrowserScraper):
-    provider_name = "Xoom"
+    provider_name = "Xoom (PayPal)"
     corridors = active_corridors(XOOM_LOCALE)
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         raise PermanentScraperError(
-            "Xoom requires sign-in; public calculator API unavailable"
+            "Xoom (PayPal) requires sign-in; no public AUD→NPR calculator"
         )

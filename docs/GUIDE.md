@@ -168,46 +168,29 @@ The API returns the same JSON shape previously written to `data/latest_rates.jso
 
 ---
 
-## Tier B status (all corridors → NPR)
+## Tier B status (AUD→NPR only)
 
-| Provider | Priority | Corridors | Method | Status |
-|----------|----------|-----------|--------|--------|
-| Remitly | High | AUD, USD, GBP, CAD, NZD, EUR, AED | Calculator API | Live; new + existing user rates |
-| Western Union | High | AUD, USD, GBP, CAD, NZD, SAR, AED | Playwright | AUD per-method; others widget N/A |
-| WorldRemit | High | AUD, USD, GBP, CAD, NZD, EUR | GraphQL API | Live; new + existing when promo present |
-| Xoom | Medium | USD, GBP, CAD, EUR | — | Sign-in required; records `error` |
-| MoneyGram | Medium | AUD, USD, GBP, CAD | — | Bot protection; records `error` |
-| Xe Money Transfer | Medium | AUD, USD, GBP, CAD, NZD | Playwright | Live via xe.com converter |
-| Instarem | Medium | AUD, SGD, GBP | REST API | Live; applied FX rate |
-| OFX | Medium | AUD, USD, GBP, CAD, NZD | — | No public quote API |
-| OrbitRemit | Low | AUD, NZD, GBP | — | Cloudflare protected |
-| TorFX | Low | AUD, GBP, NZD | — | Cloudflare protected |
+| Provider | Status |
+|----------|--------|
+| **Wise** | Live — public transfer quote API |
+| **Remitly** | Live — calculator API; new + existing user rates |
+| **WorldRemit** | Live — GraphQL API |
+| **Instarem** | Live — applied FX (`instarem_fx_rate`) |
+| **Instarem (by Nium)** | Live — same Nium API as Instarem |
+| **Western Union** | Live with browser (`skip_browser=false`); skipped on Railway default |
+| **Xe Money Transfer** | Live with browser; skipped on Railway default |
+| **Xoom (PayPal)** | Unavailable — sign-in required |
+| **MoneyGram** | Unavailable — bot protection |
+| **Skrill** | Unavailable — no public API |
+| **Ria Money Transfer** | Unavailable — API blocks bots |
+| **Revolut** | Unavailable — no AUD→NPR public quote |
+| **ACE Money Transfer** | Unavailable — sign-in / Cloudflare |
+| **LuLu Exchange** | Unavailable — no public API |
+| **Taptap Send** | Unavailable — mobile app API only |
 
-**Tier C** (mid-market reference, no send fee): QAR, SAR, KWD, BHD, OMR, MYR, JPY, KRW, SGD, HKD, INR, ILS, CHF, NOK, SEK, DKK, THB, EUR → NPR via Wise / ExchangeRate-API / Open Exchange Rates fallback.
+Unavailable providers still appear in API output with `"status": "error"` so the frontend can show them.
 
-Output JSON includes a `coverage` block listing all configured corridors.
-
-Test API scrapers: `python scripts/test_tier_b.py --api-only`
-
-Test browser scrapers: `python scripts/test_tier_b.py --provider Xe`
-
-Full browser run: `python main.py --once` (~15–30 min with all corridors)
-
-| Tier | Source | Providers |
-|------|--------|-------------|
-| A | REST APIs | Wise, ExchangeRate-API, Open Exchange Rates (all active send currencies → NPR) |
-| B | API + Playwright | All 10 remittance providers (see table above) |
-| C | API fallback | 18 mid-market reference currencies → NPR |
-
-Default send amount: **1000** in send currency (configurable via `SEND_AMOUNT` in `.env` or `--send-amount` flag).
-
-### Corridor configuration
-
-Corridors are defined in `constants.py`:
-
-- `ACTIVE_SEND_CURRENCIES` — Tier A + Tier B send currencies
-- `TIER_B_CORRIDORS` — per-provider corridor list
-- `TIER_C_CURRENCIES` — mid-market-only currencies
+More send currencies can be added later via `ACTIVE_SEND_CURRENCIES` in `constants.py`.
 
 ### New vs existing user rates
 
