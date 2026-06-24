@@ -16,7 +16,7 @@ from tier_b.ace import AceScraper
 from tier_b.lulu import LuLuScraper
 from tier_b.taptap_send import TaptapSendScraper
 
-# Always run (no Playwright) — includes fail-fast stubs for blocked providers
+# No Playwright — fast on Railway with LIVE_API_SKIP_BROWSER=true
 API_SCRAPERS = [
     WiseTransferScraper,
     RemitlyScraper,
@@ -24,19 +24,19 @@ API_SCRAPERS = [
     InstaremScraper,
     InstaremNiumScraper,
     XoomScraper,
-    MoneyGramScraper,
-    SkrillScraper,
-    RiaScraper,
-    RevolutScraper,
-    AceScraper,
-    LuLuScraper,
-    TaptapSendScraper,
 ]
 
-# Playwright required (skipped when LIVE_API_SKIP_BROWSER=true)
+# Playwright — set LIVE_API_SKIP_BROWSER=false on Railway for full coverage
 BROWSER_SCRAPERS = [
     WesternUnionScraper,
     XeScraper,
+    RiaScraper,
+    TaptapSendScraper,
+    SkrillScraper,
+    MoneyGramScraper,
+    AceScraper,
+    LuLuScraper,
+    RevolutScraper,
 ]
 
 ALL_BROWSER_SCRAPERS = API_SCRAPERS + BROWSER_SCRAPERS

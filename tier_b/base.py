@@ -24,16 +24,22 @@ class BaseBrowserScraper(ABC):
         self.timeout = settings.playwright_timeout_ms
 
     @contextmanager
-    def page_context(self) -> Generator[Page, None, None]:
+    def page_context(
+        self, context_options: dict[str, Any] | None = None
+    ) -> Generator[Page, None, None]:
         launch_args = ["--disable-blink-features=AutomationControlled"]
+        ctx_kwargs: dict[str, Any] = {
+            "user_agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "viewport": {"width": 1280, "height": 900},
+        }
+        if context_options:
+            ctx_kwargs.update(context_options)
+
         if self._external_browser:
-            context = self._external_browser.new_context(
-                user_agent=(
-                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                ),
-                viewport={"width": 1280, "height": 900},
-            )
+            context = self._external_browser.new_context(**ctx_kwargs)
             page = context.new_page()
             page.set_default_timeout(self.timeout)
             try:
@@ -46,13 +52,7 @@ class BaseBrowserScraper(ABC):
                     headless=settings.playwright_headless,
                     args=launch_args,
                 )
-                context = browser.new_context(
-                    user_agent=(
-                        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                    ),
-                    viewport={"width": 1280, "height": 900},
-                )
+                context = browser.new_context(**ctx_kwargs)
                 page = context.new_page()
                 page.set_default_timeout(self.timeout)
                 try:

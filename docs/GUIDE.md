@@ -179,14 +179,14 @@ The API returns the same JSON shape previously written to `data/latest_rates.jso
 | **Instarem (by Nium)** | Live — same Nium API as Instarem |
 | **Western Union** | Live with browser (`skip_browser=false`); skipped on Railway default |
 | **Xe Money Transfer** | Live with browser; skipped on Railway default |
-| **Xoom (PayPal)** | Unavailable — sign-in required |
-| **MoneyGram** | Unavailable — bot protection |
-| **Skrill** | Unavailable — no public API |
-| **Ria Money Transfer** | Unavailable — API blocks bots |
-| **Revolut** | Unavailable — no AUD→NPR public quote |
-| **ACE Money Transfer** | Unavailable — sign-in / Cloudflare |
-| **LuLu Exchange** | Unavailable — no public API |
-| **Taptap Send** | Unavailable — mobile app API only |
+| **Xoom (PayPal)** | Live — Wise comparisons API (aggregated quote) |
+| **Ria Money Transfer** | Live — Playwright + `MoneyTransferCalculator/Calculate` |
+| **Taptap Send** | Live — Playwright `api.taptapsend.com/api/fxRates` |
+| **Skrill** | Live — Playwright calculator (AU→Nepal country select) |
+| **MoneyGram** | Unavailable — fee-quote API returns 401/captcha (partner API only) |
+| **Revolut** | Unavailable — no AUD→NPR on public web/API |
+| **ACE Money Transfer** | Unavailable — calculator needs login; no guest rate |
+| **LuLu Exchange** | Unavailable — rates only in LuLu Money app |
 
 Unavailable providers still appear in API output with `"status": "error"` so the frontend can show them.
 
