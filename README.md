@@ -1,193 +1,140 @@
-# PaisaPathau Remittance Rate Scraper
+# PaisaPathau Remittance Rate API
 
-Production-grade Python pipeline that collects live exchange rates and transfer fees from remittance providers for **PaisaPathau.com** — currently scoped to **AUD→NPR** (expandable later).
+Production pipeline for **PaisaPathau.com** — fetches live remittance rates from 10+ providers across **all major send currencies → NPR** (AUD, USD, GBP, CAD, NZD, EUR, AED, SAR, SGD + Tier C mid-market).
+
+**Production runs on [Railway](https://railway.app/)** as a live API with on-demand provider fetching and a 120-second server-side cache.
 
 ## Quick Guide
 
-See **[docs/GUIDE.md](docs/GUIDE.md)** for setup, API keys, run commands, and pipeline flow.
+See **[docs/GUIDE.md](docs/GUIDE.md)** for setup, API keys, endpoints, and provider coverage.
+
+## Architecture
+
+```
+WordPress / frontend
+        │
+        ▼
+Railway  →  python main.py --serve
+        │       ├── GET /data/latest_rates.json
+        │       ├── GET /data/aud_npr_transfer_methods.json
+        │       └── GET /health
+        │
+        ▼
+On request (or cache hit):
+  Tier A (Wise, ExchangeRate-API, OXR)
+  Tier B (Remitly, WorldRemit, Instarem, …)
+  Tier C (mid-market: QAR, KWD, JPY, EUR, …)
+```
+
+- **First request** (cold): ~6–25 seconds — hits provider APIs live
+- **Cached requests** (within 120s): ~1 second — same payload, `"cached": true`
+- **Cache warm-up** on startup when `LIVE_API_WARM_CACHE=true`
 
 ## Features
 
-- **Tier A** — Official APIs: Wise, ExchangeRate-API, Open Exchange Rates (AUD reference rates)
-- **Tier B** — Remitly, WorldRemit, Instarem (API) + Western Union (Playwright send-flow)
-- **Tier C** — Disabled while scoped to AUD only (re-enable when adding more send currencies)
-- Runs every **30 minutes** via GitHub Actions (or continuously on Railway/Render)
-- Outputs JSON, CSV, and SQLite history for trend analysis
-- Serves JSON via **GitHub Pages** for WordPress frontend consumption
-- Graceful error handling with retries and optional Slack/webhook alerts
+- **Live API** — real-time rates on each request (with smart caching)
+- **Tier A** — Wise, ExchangeRate-API, Open Exchange Rates
+- **Tier B** — Remitly, WorldRemit, Instarem, Western Union, Xe, and more
+- **Tier C** — Mid-market NPR rates for Gulf, Asia, and Europe reference currencies
+- CORS support for WordPress frontend
+- Graceful per-provider error handling
 
-## Quick Start
+## Railway (production)
 
-### 1. Clone and install
-
-```bash
-git clone https://github.com/YOUR_USERNAME/paisapathau-scraper.git
-cd paisapathau-scraper
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-playwright install chromium
-```
-
-### 2. Configure environment
+Start command (already in `railway.toml` / `Procfile`):
 
 ```bash
-cp .env.example .env
-# Edit .env with your API keys
+python main.py --serve
 ```
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `EXCHANGERATE_API_KEY` | Recommended | Free key from [exchangerate-api.com](https://www.exchangerate-api.com/) |
-| `OPEN_EXCHANGE_RATES_APP_ID` | Optional | Backup from [openexchangerates.org](https://openexchangerates.org/) |
-| `ALERT_WEBHOOK_URL` | Optional | Slack or generic webhook for failure alerts |
-| `SEND_AMOUNT` | No | Default send amount (default: `1000`) |
-
-### 3. Run locally
-
-```bash
-# Single fetch cycle
-python main.py --once
-
-# Continuous scheduler (every 30 min)
-python main.py
-
-# API-only mode (skip browser scrapers)
-python main.py --once --skip-browser
-```
-
-## Output Files
-
-After each cycle, files are written to `data/`:
-
-| File | Description |
-|------|-------------|
-| `latest_rates.json` | Current rates (overwritten each run) |
-| `rates_YYYYMMDD_HHMM.json` | Timestamped snapshot |
-| `latest_rates.csv` | Flat CSV for WordPress / Google Sheets |
-| `rates_history.db` | SQLite historical data |
-
-Snapshots older than **3 days** are deleted automatically after each run. `latest_rates.json` is always kept.
-
-### AUD → NPR transfer method matrix
-
-`data/aud_npr_transfer_methods.json` includes per-provider rows for:
-
-- Bank Transfer, Cash Pickup, Mobile Money Transfer, Wallet Transfer
-- Fee, new/existing user rates, min/max amount (when API exposes them), transfer speeds
-
-Also embedded in `latest_rates.json` under `aud_npr_transfer_methods`.
-
-### JSON API Endpoint
-
-Configure GitHub Pages to serve the `/data` folder. Your WordPress frontend fetches:
+**Required env vars:**
 
 ```
-https://YOUR_USERNAME.github.io/REPO-NAME/data/latest_rates.json
+LIVE_API_SKIP_BROWSER=true
+LIVE_API_WARM_CACHE=true
+LIVE_API_CACHE_SECONDS=120
+EXCHANGERATE_API_KEY=your_key
+LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```
 
-Example WordPress integration:
+Health check path: `/health`
+
+### API endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /data/latest_rates.json` | Full rate payload (all providers + corridors) |
+| `GET /data/aud_npr_transfer_methods.json` | AUD→NPR transfer method matrix |
+| `GET /health` | Health check |
+
+**Query params:** `send_amount`, `fresh=true` (bypass cache), `skip_browser`
+
+### WordPress integration
 
 ```javascript
-fetch('https://YOUR_USERNAME.github.io/REPO-NAME/data/latest_rates.json')
+fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
   .then(res => res.json())
   .then(data => {
     console.log(data.last_updated);
-    console.log(data.corridors);
+    console.log(data.cached);       // true if served from cache
+    console.log(data.fetch_mode);   // "live"
+    console.log(data.all_rates);
   });
 ```
 
-## GitHub Actions Deploymentlatest_rates
+## Local development
 
-### Setup
+```bash
+git clone <repo-url> && cd scrapper
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+# Add EXCHANGERATE_API_KEY
 
-1. Push this repo to GitHub
-2. Add repository secrets:
-   - `EXCHANGERATE_API_KEY`
-   - `OPEN_EXCHANGE_RATES_APP_ID` (optional)
-   - `ALERT_WEBHOOK_URL` (optional)
-3. Enable GitHub Pages: **Settings → Pages → Source: GitHub Actions**
-4. The workflow (`.github/workflows/scraper.yml`) runs every 30 minutes, commits updated data, and deploys to Pages
+# Start live API locally
+python main.py --serve --port 8000
+# → http://localhost:8000/data/latest_rates.json
+```
 
-### Manual trigger
+| Command | Use case |
+|---------|----------|
+| `python main.py --serve` | **Live API** (same as Railway) |
+| `python main.py --once --skip-browser` | One-off fetch to `data/` (dev/debug) |
+| `pytest tests/ -v` | Run unit tests |
 
-Actions → **Scraper Pipeline** → **Run workflow**
+Playwright is only needed if `LIVE_API_SKIP_BROWSER=false` (Western Union browser scrape).
+
+## Legacy batch mode (optional)
+
+`python main.py --once` still writes static JSON/CSV/SQLite to `data/` for local debugging. The scheduled GitHub Actions scraper is **disabled** — use Railway for production. Manual workflow: Actions → **Scraper Pipeline (manual)** → Run workflow.
 
 ## Project Structure
 
 ```
-├── main.py                 # CLI entry point (--once, --interval)
-├── scheduler.py            # Orchestrates Tier A/B/C fetch cycles
-├── storage.py              # SQLite persistence
-├── output.py               # JSON/CSV generation
-├── alerting.py             # Optional webhook alerts
-├── config.py               # Environment configuration
+├── main.py                 # CLI (--serve, --once)
+├── live_api.py             # FastAPI app (Railway entrypoint)
+├── scheduler.py            # Fetch orchestration + cache backing
 ├── constants.py            # Currency/corridor definitions
-├── models.py               # RateRecord data model
-├── utils.py                # Logging, retries, parsing
-├── tier_a/                 # API scrapers (Wise, ExchangeRate-API, OXR)
-├── tier_b/                 # Playwright scrapers (10 providers)
+├── tier_a/                 # Reference rate APIs
+├── tier_b/                 # Remittance provider scrapers
 ├── tier_c/                 # Mid-market rate fetcher
-├── data/                   # Output directory (GitHub Pages root)
-├── tests/                  # Unit tests
-└── .github/workflows/      # CI/CD scheduler
+├── railway.toml            # Railway deploy config
+└── tests/
 ```
 
-## Rate Record Schema
+## Infrastructure
 
-Each rate includes:
-
-```json
-{
-  "provider": "Remitly",
-  "customer_type": "new_user",
-  "rate_label": "New User",
-  "from_currency": "AUD",
-  "from_country": "Australia",
-  "from_flag": "🇦🇺",
-  "to_currency": "NPR",
-  "send_amount": 1000,
-  "exchange_rate": 87.92,
-  "fee": 6.50,
-  "net_send_amount": 993.50,
-  "receive_amount": 87420.44,
-  "transfer_speed": "Minutes to 3 business days",
-  "delivery_method": "Bank deposit / Cash pickup",
-  "timestamp": "2026-06-11T12:00:00+00:00",
-  "source": "scraper",
-  "status": "ok"
-}
-```
+| Service | Role | Cost |
+|---------|------|------|
+| **Railway** | Production live API | Free tier / ~$5+/mo |
+| ExchangeRate-API | Tier A + Tier C fallback | Free tier |
+| GitHub Actions | Optional manual batch only | Free |
 
 ## Testing
 
 ```bash
 pytest tests/ -v
 ```
-
-## Alternative Schedulers
-
-See [docs/SCHEDULER_ALTERNATIVES.md](docs/SCHEDULER_ALTERNATIVES.md) for Railway.app and Render.com deployment options when you need a persistent process instead of GitHub Actions.
-
-## Infrastructure Cost
-
-| Service | Cost |
-|---------|------|
-| GitHub Actions | Free (2,000 min/month) |
-| GitHub Pages | Free |
-| ExchangeRate-API | Free tier (1,500 req/month) |
-| Open Exchange Rates | Free tier (1,000 req/month) |
-| Railway / Render | Free tier available |
-
-**Estimated total: $0–$20/month**
-
-## Error Handling
-
-- Each provider fetch is isolated — one failure does not stop others
-- 3 retry attempts for transient errors
-- Failed records get `"status": "error"` in output
-- Optional webhook alert when >50% of fetches fail
-- All errors logged to `logs/scraper.log`
 
 ## License
 

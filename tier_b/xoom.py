@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from constants import XOOM_LOCALE
+from constants import XOOM_LOCALE, active_corridors
 from models import RateRecord
 from tier_b.base import BaseBrowserScraper
 from utils import PermanentScraperError
@@ -10,7 +10,7 @@ from utils import PermanentScraperError
 
 class XoomScraper(BaseBrowserScraper):
     provider_name = "Xoom"
-    corridors = list(XOOM_LOCALE.keys())
+    corridors = active_corridors(XOOM_LOCALE)
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         raise PermanentScraperError(

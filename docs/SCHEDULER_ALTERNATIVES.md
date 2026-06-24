@@ -1,87 +1,68 @@
-# Alternative Scheduler Options
+# Deployment Notes
 
-GitHub Actions is the default scheduler (every 30 minutes, zero cost). For a **persistent 24/7 process** or faster recovery from cold starts, use one of these free-tier alternatives.
+## Railway (production — recommended)
 
-## Railway.app
+The live API runs on Railway with on-demand fetching and server-side caching.
 
-[Railway](https://railway.app/) offers a free tier suitable for long-running workers.
-
-### Setup
-
-1. Create a new project on Railway and connect your GitHub repo
-2. Add environment variables from `.env.example`
-3. Set the start command:
+**Start command:**
 
 ```bash
-python main.py --interval 30
+python main.py --serve
 ```
 
-4. Railway `Procfile` (optional):
+Configured in `railway.toml`, `Procfile`, and `nixpacks.toml`.
+
+**Key env vars:**
 
 ```
-worker: python main.py --interval 30
+LIVE_API_SKIP_BROWSER=true
+LIVE_API_WARM_CACHE=true
+LIVE_API_CACHE_SECONDS=120
+EXCHANGERATE_API_KEY=your_key
+PORT                         # set automatically by Railway
 ```
 
-### Notes
+**Health check:** `/health`
 
-- Railway free tier includes limited monthly hours; monitor usage in the dashboard
-- Playwright requires a build step — add to `railway.toml` or Dockerfile:
+**Do not run** `python main.py` (scheduler loop) on Railway — that is the old batch mode with no HTTP server.
 
-```dockerfile
-FROM python:3.11-slim
-RUN apt-get update && apt-get install -y wget gnupg && \
-    pip install -r requirements.txt && \
-    playwright install --with-deps chromium
-COPY . .
-CMD ["python", "main.py", "--interval", "30"]
-```
+### Cache behaviour
 
-- Push `data/` to your repo separately (e.g. via a second GitHub Action on a schedule) if you still want GitHub Pages hosting
+| Scenario | Response time | `cached` field |
+|----------|---------------|----------------|
+| Startup warm-up | ~6–25s (background) | — |
+| First visitor after cache expires | ~6–25s | `false` |
+| Subsequent visitors within 120s | ~1s | `true` |
+| `?fresh=true` | ~6–25s (hits providers) | `false` |
+
+Set `LIVE_API_CACHE_SECONDS=120` (or higher) to avoid Remitly rate limits when many users load the site.
+
+### Western Union on Railway
+
+Default `LIVE_API_SKIP_BROWSER=true` skips Playwright. To include WU per-method data:
+
+1. Use the `Dockerfile` (`playwright install chromium`)
+2. Set `LIVE_API_SKIP_BROWSER=false`
+3. Expect ~2 min cold responses
 
 ---
 
-## Render.com
+## Render / Fly.io (alternatives)
 
-[Render](https://render.com/) free **Background Worker** tier runs continuously with spin-down after inactivity.
-
-### Setup
-
-1. Create a **Background Worker** service
-2. Connect your GitHub repository
-3. Build command:
+Same start command and env vars as Railway:
 
 ```bash
-pip install -r requirements.txt && playwright install chromium && playwright install-deps
+python main.py --serve
 ```
 
-4. Start command:
-
-```bash
-python main.py --interval 30
-```
-
-5. Add environment variables in the Render dashboard
-
-### Notes
-
-- Free workers spin down after 15 minutes of inactivity; use `--once` with an external cron (e.g. Render Cron Job or cron-job.org) as an alternative:
-
-```bash
-python main.py --once
-```
-
-- For Cron Jobs on Render, schedule every 30 minutes and use `--once`
+Bind to `0.0.0.0` and use the platform's `PORT` env var (handled automatically via `config.py`).
 
 ---
 
-## Comparison
+## Legacy batch mode (not used in production)
 
-| Feature | GitHub Actions | Railway | Render |
-|---------|---------------|---------|--------|
-| Cost | Free | Free tier | Free tier |
-| 24/7 persistent | No (cron) | Yes | Yes (with spin-down) |
-| Playwright support | Good | Good (Docker) | Good |
-| Auto-commit data | Built-in | Manual/extra step | Manual/extra step |
-| GitHub Pages deploy | Built-in | Separate step | Separate step |
+`python main.py --once` fetches all providers once and writes static files to `data/`. Previously run every 30 minutes via GitHub Actions.
 
-**Recommendation:** Start with GitHub Actions (included in this repo). Move to Railway or Render only if you need sub-30-minute intervals or hit Actions minute limits.
+The scheduled workflow is **disabled**. Manual trigger only: Actions → **Scraper Pipeline (manual)**.
+
+Use batch mode only for local debugging or if you need static JSON snapshots in the repo.

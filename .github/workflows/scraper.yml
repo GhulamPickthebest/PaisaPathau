@@ -1,11 +1,11 @@
-name: Scraper Pipeline
+# Legacy batch scraper — disabled in favour of Railway live API.
+# Production: Railway runs `python main.py --serve` (real-time fetch + 120s cache).
+# This workflow is kept for optional manual runs only (e.g. refresh static data/ snapshots).
+
+name: Scraper Pipeline (manual)
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"
   workflow_dispatch:
-  push:
-    branches: [main, master]
 
 permissions:
   contents: write
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository

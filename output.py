@@ -8,6 +8,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from config import DATA_DIR
+from constants import (
+    ACTIVE_SEND_CURRENCIES,
+    PROVIDER_PRIORITY,
+    TIER_B_CORRIDORS,
+    TIER_C_CURRENCIES,
+)
 from models import PipelineResult, RateRecord, utc_now_iso
 from transfer_methods.aud_npr import fetch_aud_npr_transfer_methods
 from utils import logger
@@ -45,6 +51,12 @@ def build_output_payload(
         "total_providers": len(result.unique_providers),
         "corridors": result.corridors,
         "all_rates": [r.to_dict() for r in result.all_rates],
+        "coverage": {
+            "send_currencies": list(ACTIVE_SEND_CURRENCIES),
+            "tier_b_providers": dict(TIER_B_CORRIDORS),
+            "tier_c_currencies": list(TIER_C_CURRENCIES),
+            "provider_priority": dict(PROVIDER_PRIORITY),
+        },
     }
     if transfer_method_matrix:
         payload["aud_npr_transfer_methods"] = transfer_method_matrix

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from constants import ORBITREMIT_LOCALE
+from constants import ORBITREMIT_LOCALE, active_corridors
 from models import RateRecord
 from tier_b.base import BaseBrowserScraper
 from utils import PermanentScraperError
@@ -10,7 +10,7 @@ from utils import PermanentScraperError
 
 class OrbitRemitScraper(BaseBrowserScraper):
     provider_name = "OrbitRemit"
-    corridors = list(ORBITREMIT_LOCALE.keys())
+    corridors = active_corridors(ORBITREMIT_LOCALE)
 
     def fetch_corridor(self, from_currency: str) -> RateRecord:
         raise PermanentScraperError(

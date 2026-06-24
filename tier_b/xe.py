@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import re
 
-from constants import XE_LOCALE
+from constants import XE_LOCALE, active_corridors
 from tier_b.base import BaseBrowserScraper
 from utils import PermanentScraperError, retry
 
 
 class XeScraper(BaseBrowserScraper):
     provider_name = "Xe Money Transfer"
-    corridors = list(XE_LOCALE.keys())
+    corridors = active_corridors(XE_LOCALE)
 
     @retry(exceptions=(Exception,))
     def fetch_corridor(self, from_currency: str) -> RateRecord:

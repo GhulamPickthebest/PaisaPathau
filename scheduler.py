@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from alerting import alert_on_high_failure_rate
 from cleanup import cleanup_old_snapshots
 from config import settings
-from constants import ACTIVE_SEND_CURRENCIES, TIER_C_CURRENCIES
+from constants import TIER_C_CURRENCIES
 from models import PipelineResult, RateRecord
 from output import build_output_payload, write_all_outputs_from_payload
 from storage import insert_rates
@@ -89,10 +89,7 @@ def fetch_tier_b(send_amount: float, skip_browser: bool = False) -> tuple[list[R
 
 def fetch_tier_c(send_amount: float) -> tuple[list[RateRecord], list[str]]:
     if not TIER_C_CURRENCIES:
-        logger.info(
-            "Tier C skipped (scoped to %s→NPR only)",
-            ", ".join(ACTIVE_SEND_CURRENCIES),
-        )
+        logger.info("Tier C skipped (no mid-market currencies configured)")
         return [], []
     records: list[RateRecord] = []
     errors: list[str] = []

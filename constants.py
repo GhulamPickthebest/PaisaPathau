@@ -2,15 +2,49 @@
 
 from __future__ import annotations
 
-# Active scrape scope — expand this list when adding corridors later.
-ACTIVE_SEND_CURRENCIES: list[str] = ["AUD"]
 TARGET_CURRENCY = "NPR"
+
+# All send currencies used by Tier B remittance providers (union of provider corridors).
+ACTIVE_SEND_CURRENCIES: list[str] = [
+    "AUD",
+    "USD",
+    "GBP",
+    "CAD",
+    "NZD",
+    "EUR",
+    "AED",
+    "SAR",
+    "SGD",
+]
+
+# Tier C: mid-market reference rates where remittance scraping is limited/unavailable.
+TIER_C_CURRENCIES: list[str] = [
+    "QAR",
+    "SAR",
+    "KWD",
+    "BHD",
+    "OMR",
+    "MYR",
+    "JPY",
+    "KRW",
+    "SGD",
+    "HKD",
+    "INR",
+    "ILS",
+    "CHF",
+    "NOK",
+    "SEK",
+    "DKK",
+    "THB",
+    "EUR",
+]
 
 
 def active_corridors(source: list[str] | dict[str, str]) -> list[str]:
     """Return send currencies from *source* that are in ACTIVE_SEND_CURRENCIES."""
     keys = list(source.keys()) if isinstance(source, dict) else list(source)
     return [currency for currency in keys if currency in ACTIVE_SEND_CURRENCIES]
+
 
 # ISO currency -> display metadata
 CURRENCY_META: dict[str, dict[str, str]] = {
@@ -120,16 +154,33 @@ TORFX_LOCALE: dict[str, str] = {
     "NZD": "nz",
 }
 
-# Tier B provider corridor lists (AUD→NPR only for now)
+# Provider → supported send currencies → NPR
 TIER_B_CORRIDORS: dict[str, list[str]] = {
-    "Remitly": ["AUD"],
-    "Western Union": ["AUD"],
-    "WorldRemit": ["AUD"],
-    "Instarem": ["AUD"],
+    "Remitly": ["AUD", "USD", "GBP", "CAD", "NZD", "EUR", "AED"],
+    "Western Union": ["AUD", "USD", "GBP", "CAD", "NZD", "SAR", "AED"],
+    "WorldRemit": ["AUD", "USD", "GBP", "CAD", "NZD", "EUR"],
+    "Xoom": ["USD", "GBP", "CAD", "EUR"],
+    "MoneyGram": ["AUD", "USD", "GBP", "CAD"],
+    "Xe Money Transfer": ["AUD", "USD", "GBP", "CAD", "NZD"],
+    "Instarem": ["AUD", "SGD", "GBP"],
+    "OFX": ["AUD", "USD", "GBP", "CAD", "NZD"],
+    "OrbitRemit": ["AUD", "NZD", "GBP"],
+    "TorFX": ["AUD", "GBP", "NZD"],
 }
 
-# Tier C: extra mid-market currencies (disabled while scoped to AUD only)
-TIER_C_CURRENCIES: list[str] = []
+# Integration priority (documentation / alerting)
+PROVIDER_PRIORITY: dict[str, str] = {
+    "Remitly": "high",
+    "Western Union": "high",
+    "WorldRemit": "high",
+    "Xoom": "medium",
+    "MoneyGram": "medium",
+    "Xe Money Transfer": "medium",
+    "Instarem": "medium",
+    "OFX": "medium",
+    "OrbitRemit": "low",
+    "TorFX": "low",
+}
 
 # Tier A Wise corridors
 WISE_CORRIDORS: list[str] = list(ACTIVE_SEND_CURRENCIES)
@@ -150,6 +201,11 @@ PROVIDER_TRANSFER_SPEEDS: dict[str, dict[str, str]] = {
     "Western Union": {"fastest": "Minutes", "slowest": "3 business days"},
     "Wise": {"fastest": "30 minutes", "slowest": "2 business days"},
     "Xe Money Transfer": {"fastest": "1 business day", "slowest": "4 business days"},
+    "Xoom": {"fastest": "Minutes", "slowest": "3 business days"},
+    "MoneyGram": {"fastest": "Minutes", "slowest": "3 business days"},
+    "OFX": {"fastest": "1 business day", "slowest": "3 business days"},
+    "OrbitRemit": {"fastest": "1 business day", "slowest": "3 business days"},
+    "TorFX": {"fastest": "1 business day", "slowest": "3 business days"},
 }
 
 # WorldRemit payOutMethodCode -> standard label (NPR from AU)
