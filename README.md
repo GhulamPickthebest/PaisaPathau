@@ -50,12 +50,14 @@ python main.py --serve
 **Required env vars:**
 
 ```
-LIVE_API_SKIP_BROWSER=true
+LIVE_API_SKIP_BROWSER=false
 LIVE_API_WARM_CACHE=true
 LIVE_API_CACHE_SECONDS=120
 EXCHANGERATE_API_KEY=your_key
 LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```
+
+Deploy via **Dockerfile** (`railway.toml` sets `builder = DOCKERFILE`) so Playwright + Chromium are available for Ria, Taptap, Skrill, Xe, and WU per-method data. Western Union headline rates also work via the Wise comparisons API when `skip_browser=true`.
 
 Health check path: `/health`
 
@@ -102,7 +104,7 @@ python main.py --serve --port 8000
 | `python main.py --once --skip-browser` | One-off fetch to `data/` (dev/debug) |
 | `pytest tests/ -v` | Run unit tests |
 
-Playwright is only needed if `LIVE_API_SKIP_BROWSER=false` (Western Union browser scrape).
+Playwright is required for full provider coverage (`LIVE_API_SKIP_BROWSER=false`, Railway default). Set `LIVE_API_SKIP_BROWSER=true` locally for faster dev without browser scrapers.
 
 ## Legacy batch mode (optional)
 

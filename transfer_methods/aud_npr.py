@@ -21,6 +21,8 @@ from constants import (
 from models import TransferMethodRow, utc_now_iso
 from tier_b.instarem import parse_instarem_computed_payload
 from tier_b.western_union_transfer_methods import WesternUnionTransferMethodsScraper
+from tier_b.wise_comparison import fetch_comparison_quote
+from tier_b.wise_transfer import _format_delivery
 from tier_b.worldremit import CREATE_CALCULATION, WORLDREMIT_COUNTRY
 from utils import logger
 
@@ -84,6 +86,13 @@ def fetch_aud_npr_transfer_methods(
             rows.extend(_fetch_western_union_rows(amount))
         except Exception as exc:
             msg = f"western_union: {exc}"
+            logger.error("AUD/NPR transfer methods: %s", msg)
+            errors.append(msg)
+    else:
+        try:
+            rows.extend(_fetch_western_union_comparison_rows(amount))
+        except Exception as exc:
+            msg = f"western_union_comparison: {exc}"
             logger.error("AUD/NPR transfer methods: %s", msg)
             errors.append(msg)
 
@@ -443,6 +452,35 @@ def _fetch_wise_rows(amount: float) -> list[TransferMethodRow]:
             receive_amount_new=receive,
             receive_amount_existing=receive,
             notes="Wise public transfer quote; no new/existing rate split on this endpoint",
+        )
+    ]
+
+
+def _fetch_western_union_comparison_rows(amount: float) -> list[TransferMethodRow]:
+    """Bank-transfer row from Wise comparisons when Playwright is skipped."""
+    quote = fetch_comparison_quote("western-union", "AUD", send_amount=amount)
+    rate = float(quote["rate"])
+    fee = float(quote["fee"])
+    receive = float(quote["receive_amount"])
+    duration = quote.get("delivery") or {}
+    fastest = _format_iso_duration(duration.get("min")) or _speeds("Western Union")[0]
+    slowest = _format_iso_duration(duration.get("max")) or _speeds("Western Union")[1]
+
+    return [
+        TransferMethodRow(
+            provider="Western Union",
+            transfer_method="Bank Transfer",
+            fee=fee,
+            new_user_rate=rate,
+            existing_user_rate=rate,
+            min_amount=None,
+            max_amount=None,
+            fastest_speed=fastest,
+            slowest_speed=slowest,
+            send_amount=amount,
+            receive_amount_new=receive,
+            receive_amount_existing=receive,
+            notes="Wise comparisons quote; enable skip_browser=false for per-method data",
         )
     ]
 

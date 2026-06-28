@@ -15,12 +15,14 @@ Configured in `railway.toml`, `Procfile`, and `nixpacks.toml`.
 **Key env vars:**
 
 ```
-LIVE_API_SKIP_BROWSER=true
+LIVE_API_SKIP_BROWSER=false
 LIVE_API_WARM_CACHE=true
 LIVE_API_CACHE_SECONDS=120
 EXCHANGERATE_API_KEY=your_key
 PORT                         # set automatically by Railway
 ```
+
+**Build:** `railway.toml` uses `builder = DOCKERFILE` so Playwright + Chromium are installed.
 
 **Health check:** `/health`
 
@@ -30,20 +32,17 @@ PORT                         # set automatically by Railway
 
 | Scenario | Response time | `cached` field |
 |----------|---------------|----------------|
-| Startup warm-up | ~6–25s (background) | — |
-| First visitor after cache expires | ~6–25s | `false` |
+| Startup warm-up | ~1–3 min (background) | — |
+| First visitor after cache expires | ~1–3 min (with browser scrapers) | `false` |
 | Subsequent visitors within 120s | ~1s | `true` |
-| `?fresh=true` | ~6–25s (hits providers) | `false` |
+| `?fresh=true` | ~1–3 min (hits providers) | `false` |
+| `?skip_browser=true` | ~6–25s (API scrapers only) | varies |
 
 Set `LIVE_API_CACHE_SECONDS=120` (or higher) to avoid Remitly rate limits when many users load the site.
 
-### Western Union on Railway
+### Fast mode (optional)
 
-Default `LIVE_API_SKIP_BROWSER=true` skips Playwright. To include WU per-method data:
-
-1. Use the `Dockerfile` (`playwright install chromium`)
-2. Set `LIVE_API_SKIP_BROWSER=false`
-3. Expect ~2 min cold responses
+Set `LIVE_API_SKIP_BROWSER=true` (or `?skip_browser=true`) to skip Playwright. Western Union still returns a headline rate via the Wise comparisons API; Ria, Taptap, Skrill, and Xe are skipped.
 
 ---
 

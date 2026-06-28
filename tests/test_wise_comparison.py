@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 from tier_b.wise_comparison import fetch_comparison_quote
+from tier_b.western_union_api import WesternUnionApiScraper
 from tier_b.xoom import XoomScraper
 
 
@@ -47,3 +48,21 @@ def test_xoom_scraper_builds_record():
     assert record.status == "ok"
     assert record.provider == "Xoom (PayPal)"
     assert record.exchange_rate == 102.5
+
+
+def test_western_union_api_scraper_builds_record():
+    with patch(
+        "tier_b.western_union_api.fetch_comparison_quote",
+        return_value={
+            "rate": 101.2,
+            "fee": 2.9,
+            "receive_amount": 101200.0,
+            "delivery": {"min": "PT5M", "max": "P1D"},
+        },
+    ):
+        record = WesternUnionApiScraper(send_amount=1000).fetch_corridor("AUD")
+
+    assert record.status == "ok"
+    assert record.provider == "Western Union"
+    assert record.exchange_rate == 101.2
+    assert record.source == "wise_comparison"

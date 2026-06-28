@@ -85,7 +85,7 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 | Param | Default | Description |
 |-------|---------|-------------|
 | `send_amount` | 1000 | Send amount in source currency |
-| `skip_browser` | `true` | `false` includes Western Union (~2 min response) |
+| `skip_browser` | `false` on Railway | `true` skips Playwright (faster; WU still works via Wise comparisons API) |
 | `fresh=true` | off | Bypass 120s cache, hit providers immediately |
 
 ### Railway deployment
@@ -100,12 +100,14 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 **Env vars on Railway:**
 
 ```
-LIVE_API_SKIP_BROWSER=true
+LIVE_API_SKIP_BROWSER=false
 LIVE_API_WARM_CACHE=true
 LIVE_API_CACHE_SECONDS=120
 EXCHANGERATE_API_KEY=your_key
 LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```
+
+Use the **Dockerfile** build (`railway.toml` → `builder = DOCKERFILE`) for Playwright. First uncached fetch with all browser scrapers may take ~1–3 minutes; `/health` returns immediately while cache warms in the background.
 
 Railway injects `PORT` — the app uses it automatically. Health check: `/health`.
 
@@ -114,7 +116,7 @@ Railway injects `PORT` — the app uses it automatically. Health check: `/health
 ```
 API_PORT=8000
 LIVE_API_CACHE_SECONDS=120   # avoids Remitly 429 when many visitors load at once
-LIVE_API_SKIP_BROWSER=true  # fast mode; set false for full WU per-method data
+LIVE_API_SKIP_BROWSER=false  # Railway Dockerfile default; true = fast mode without Playwright
 LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```
 
@@ -177,7 +179,7 @@ The API returns the same JSON shape previously written to `data/latest_rates.jso
 | **WorldRemit** | Live — GraphQL API |
 | **Instarem** | Live — applied FX (`instarem_fx_rate`) |
 | **Instarem (by Nium)** | Live — same Nium API as Instarem |
-| **Western Union** | Live with browser (`skip_browser=false`); skipped on Railway default |
+| **Western Union** | Live — Wise comparisons API (headline rate); per-method + new/existing rates with browser |
 | **Xe Money Transfer** | Live with browser; skipped on Railway default |
 | **Xoom (PayPal)** | Live — Wise comparisons API (aggregated quote) |
 | **Ria Money Transfer** | Live — Playwright + `MoneyTransferCalculator/Calculate` |

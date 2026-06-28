@@ -6,6 +6,7 @@ from tier_b.instarem import InstaremScraper
 from tier_b.instarem_nium import InstaremNiumScraper
 from tier_b.wise_transfer import WiseTransferScraper
 from tier_b.western_union import WesternUnionScraper
+from tier_b.western_union_api import WesternUnionApiScraper
 from tier_b.xoom import XoomScraper
 from tier_b.moneygram import MoneyGramScraper
 from tier_b.xe import XeScraper
@@ -24,11 +25,11 @@ API_SCRAPERS = [
     InstaremScraper,
     InstaremNiumScraper,
     XoomScraper,
+    WesternUnionApiScraper,
 ]
 
 # Playwright — set LIVE_API_SKIP_BROWSER=false on Railway for full coverage
 BROWSER_SCRAPERS = [
-    WesternUnionScraper,
     XeScraper,
     RiaScraper,
     TaptapSendScraper,
@@ -51,6 +52,7 @@ __all__ = [
     "InstaremScraper",
     "InstaremNiumScraper",
     "WesternUnionScraper",
+    "WesternUnionApiScraper",
     "XoomScraper",
     "MoneyGramScraper",
     "XeScraper",
