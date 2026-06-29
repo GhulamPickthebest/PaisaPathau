@@ -81,20 +81,12 @@ def fetch_aud_npr_transfer_methods(
                 logger.error("AUD/NPR transfer methods: %s", msg)
                 errors.append(msg)
 
-    if not skip_browser:
-        try:
-            rows.extend(_fetch_western_union_rows(amount))
-        except Exception as exc:
-            msg = f"western_union: {exc}"
-            logger.error("AUD/NPR transfer methods: %s", msg)
-            errors.append(msg)
-    else:
-        try:
-            rows.extend(_fetch_western_union_comparison_rows(amount))
-        except Exception as exc:
-            msg = f"western_union_comparison: {exc}"
-            logger.error("AUD/NPR transfer methods: %s", msg)
-            errors.append(msg)
+    try:
+        rows.extend(_fetch_western_union_comparison_rows(amount))
+    except Exception as exc:
+        msg = f"western_union_comparison: {exc}"
+        logger.error("AUD/NPR transfer methods: %s", msg)
+        errors.append(msg)
 
     rows.extend(_unavailable_rows(rows, amount))
 

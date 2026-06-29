@@ -32,6 +32,7 @@ class Settings:
     live_api_skip_browser: bool
     live_api_cors_origins: str
     live_api_warm_cache: bool
+    live_api_warm_cache_with_browser: bool
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -53,6 +54,10 @@ class Settings:
             == "true",
             live_api_cors_origins=os.getenv("LIVE_API_CORS_ORIGINS", "*"),
             live_api_warm_cache=os.getenv("LIVE_API_WARM_CACHE", "true").lower()
+            == "true",
+            live_api_warm_cache_with_browser=os.getenv(
+                "LIVE_API_WARM_CACHE_WITH_BROWSER", "false"
+            ).lower()
             == "true",
         )
 

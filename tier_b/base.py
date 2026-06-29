@@ -13,6 +13,16 @@ from config import settings
 from models import RateRecord, utc_now_iso
 from utils import compute_receive_amount, logger, parse_money_amount, parse_rate_from_text, retry
 
+# Keep Chromium within Railway's ~512MB–1GB RAM budget.
+CHROMIUM_LAUNCH_ARGS = [
+    "--disable-blink-features=AutomationControlled",
+    "--disable-dev-shm-usage",
+    "--no-sandbox",
+    "--disable-gpu",
+    "--disable-software-rasterizer",
+    "--disable-extensions",
+]
+
 
 class BaseBrowserScraper(ABC):
     provider_name: str = "Unknown"
@@ -27,7 +37,7 @@ class BaseBrowserScraper(ABC):
     def page_context(
         self, context_options: dict[str, Any] | None = None
     ) -> Generator[Page, None, None]:
-        launch_args = ["--disable-blink-features=AutomationControlled"]
+        launch_args = list(CHROMIUM_LAUNCH_ARGS)
         ctx_kwargs: dict[str, Any] = {
             "user_agent": (
                 "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -191,7 +201,7 @@ class SharedBrowser:
         self._playwright = sync_playwright().start()
         self._browser = self._playwright.chromium.launch(
             headless=settings.playwright_headless,
-            args=["--disable-blink-features=AutomationControlled"],
+            args=list(CHROMIUM_LAUNCH_ARGS),
         )
         return self._browser
 

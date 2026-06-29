@@ -22,11 +22,11 @@ def test_tier_b_corridor_matrix_matches_active_currencies():
 
 
 def test_all_tier_b_providers_registered():
-    from tier_b import API_SCRAPERS, BROWSER_SCRAPERS
+    from tier_b import API_SCRAPERS, BROWSER_SCRAPERS, NO_QUOTE_SCRAPERS
 
     registered = {
         cls.provider_name
-        for cls in API_SCRAPERS + BROWSER_SCRAPERS
+        for cls in API_SCRAPERS + BROWSER_SCRAPERS + NO_QUOTE_SCRAPERS
     }
     assert registered == set(TIER_B_CORRIDORS.keys())
 

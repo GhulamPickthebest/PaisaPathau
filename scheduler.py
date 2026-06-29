@@ -16,7 +16,7 @@ from transfer_methods.aud_npr import fetch_aud_npr_transfer_methods
 from tier_a.exchangerate_api import ExchangeRateApiScraper
 from tier_a.open_exchange_rates import OpenExchangeRatesScraper
 from tier_a.wise import WiseScraper
-from tier_b import API_SCRAPERS, BROWSER_SCRAPERS
+from tier_b import API_SCRAPERS, BROWSER_SCRAPERS, NO_QUOTE_SCRAPERS
 from tier_b.base import SharedBrowser
 from tier_c import TierCMidMarketFetcher
 from utils import logger
@@ -70,19 +70,29 @@ def fetch_tier_b(send_amount: float, skip_browser: bool = False) -> tuple[list[R
                 logger.error(msg)
                 errors.append(msg)
 
+    for scraper_cls in NO_QUOTE_SCRAPERS:
+        name = scraper_cls.provider_name
+        try:
+            records.extend(scraper_cls(send_amount=send_amount).fetch_all())
+        except Exception as exc:
+            msg = f"Tier B {name} failed: {exc}"
+            logger.error(msg)
+            errors.append(msg)
+
     if api_only:
         return records, errors
 
-    with SharedBrowser() as browser:
-        for scraper_cls in BROWSER_SCRAPERS:
-            name = scraper_cls.provider_name
-            try:
+    # One Chromium instance per provider — avoids OOM on Railway (~512MB RAM).
+    for scraper_cls in BROWSER_SCRAPERS:
+        name = scraper_cls.provider_name
+        try:
+            with SharedBrowser() as browser:
                 scraper = scraper_cls(browser=browser, send_amount=send_amount)
                 records.extend(scraper.fetch_all())
-            except Exception as exc:
-                msg = f"Tier B {name} failed: {exc}"
-                logger.error(msg)
-                errors.append(msg)
+        except Exception as exc:
+            msg = f"Tier B {name} failed: {exc}"
+            logger.error(msg)
+            errors.append(msg)
 
     return records, errors
 
@@ -165,15 +175,24 @@ def _fetch_and_build_payload(
     all_errors: list[str] = []
     transfer_matrix: dict = {}
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        tiers_future = executor.submit(_fetch_all_tiers, amount, skip_browser)
-        matrix_future = executor.submit(
-            fetch_aud_npr_transfer_methods,
+    # Never run Playwright tier fetch and transfer-matrix fetch in parallel —
+    # that launches two Chromium processes and triggers Railway OOM.
+    if skip_browser:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            tiers_future = executor.submit(_fetch_all_tiers, amount, skip_browser)
+            matrix_future = executor.submit(
+                fetch_aud_npr_transfer_methods,
+                send_amount=amount,
+                skip_browser=skip_browser,
+            )
+            all_records, all_errors = tiers_future.result()
+            transfer_matrix = matrix_future.result()
+    else:
+        all_records, all_errors = _fetch_all_tiers(amount, skip_browser)
+        transfer_matrix = fetch_aud_npr_transfer_methods(
             send_amount=amount,
             skip_browser=skip_browser,
         )
-        all_records, all_errors = tiers_future.result()
-        transfer_matrix = matrix_future.result()
 
     result = PipelineResult(all_rates=all_records, errors=all_errors)
     payload = build_output_payload(result, amount, transfer_matrix)

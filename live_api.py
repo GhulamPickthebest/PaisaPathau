@@ -17,6 +17,12 @@ from utils import logger
 
 
 def _warm_cache_background() -> None:
+    if not settings.live_api_skip_browser and not settings.live_api_warm_cache_with_browser:
+        logger.info(
+            "Skipping cache warm-up (browser scrapers enabled; set "
+            "LIVE_API_WARM_CACHE_WITH_BROWSER=true to override)"
+        )
+        return
     try:
         logger.info("Warming live API cache on startup...")
         payload = fetch_live_payload()

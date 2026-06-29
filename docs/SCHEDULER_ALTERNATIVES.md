@@ -40,9 +40,32 @@ PORT                         # set automatically by Railway
 
 Set `LIVE_API_CACHE_SECONDS=120` (or higher) to avoid Remitly rate limits when many users load the site.
 
-### Fast mode (optional)
+### Out of memory (OOM) on Railway
 
-Set `LIVE_API_SKIP_BROWSER=true` (or `?skip_browser=true`) to skip Playwright. Western Union still returns a headline rate via the Wise comparisons API; Ria, Taptap, Skrill, and Xe are skipped.
+Railway hobby/trial plans have **~512MB–1GB RAM**. Playwright + Chromium can exceed that if:
+
+- Cache warm-up runs a full browser fetch on **startup**
+- **Two Chromium processes** run at once (tier fetch + WU transfer-matrix scrape)
+
+**Fixes in this repo (deploy latest):**
+
+| Change | Why |
+|--------|-----|
+| `LIVE_API_WARM_CACHE_WITH_BROWSER=false` | No browser fetch on startup |
+| Sequential fetch when browser enabled | Only one Chromium at a time |
+| One browser per provider (then close) | Frees RAM between Xe/Ria/Taptap/Skrill |
+| MoneyGram/ACE/LuLu/Revolut skip browser | They always fail; no point loading pages |
+| WU transfer matrix via Wise API only | Avoids a second Chromium for WU |
+
+**Railway env vars (recommended):**
+
+```
+LIVE_API_SKIP_BROWSER=false
+LIVE_API_WARM_CACHE=true
+LIVE_API_WARM_CACHE_WITH_BROWSER=false
+```
+
+**If OOM persists:** set `LIVE_API_SKIP_BROWSER=true` (7 API providers + WU still work), or upgrade Railway memory to **2GB+**.
 
 ---
 
