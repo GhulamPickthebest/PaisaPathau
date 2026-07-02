@@ -76,8 +76,9 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /` | Table view (Provider, Rate, Payment Method, Fee, Notes) |
-| `GET /data/rates_table.json` | Flat table rows as JSON |
+| `GET /` | Streaming table (rows load progressively) |
+| `GET /data/latest_rates/stream` | SSE — emit each provider as it finishes |
+| `GET /data/rates_table.json` | Flat table rows (full wait) |
 | `GET /data/latest_rates.json` | Full rate payload |
 | `GET /data/aud_npr_transfer_methods.json` | Transfer method matrix |
 | `GET /health` | Health check |

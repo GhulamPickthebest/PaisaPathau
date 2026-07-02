@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import threading
 import time
 from contextlib import asynccontextmanager
@@ -9,11 +10,12 @@ from typing import Any
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from config import settings
 from scheduler import fetch_live_payload
-from table_view import build_rates_table_rows, render_rates_html
+from stream_fetch import iter_cached_sse_events, iter_live_sse_events
+from table_view import build_rates_table_rows, render_rates_html, render_streaming_rates_html
 from utils import logger
 
 
@@ -118,6 +120,44 @@ def _get_rates_payload(
     return payload
 
 
+def _parse_sse_done_payload(chunk: str) -> dict | None:
+    for line in chunk.splitlines():
+        if line.startswith("data: "):
+            try:
+                return json.loads(line[6:])
+            except json.JSONDecodeError:
+                return None
+    return None
+
+
+def _iter_rates_sse(
+    send_amount: float,
+    skip_browser: bool,
+    fresh: bool,
+):
+    """Yield SSE chunks; populate cache when a live fetch completes."""
+    cache_key = (send_amount, skip_browser)
+    if not fresh and settings.live_api_cache_seconds > 0:
+        cached = _cache_get(cache_key)
+        if cached:
+            logger.info("Live API stream cache hit (send_amount=%s)", send_amount)
+            yield from iter_cached_sse_events(cached)
+            return
+
+    final_payload: dict | None = None
+    for chunk in iter_live_sse_events(send_amount, skip_browser):
+        if chunk.startswith("event: done\n"):
+            done_data = _parse_sse_done_payload(chunk) or {}
+            final_payload = done_data.get("payload")
+            client_done = {k: v for k, v in done_data.items() if k != "payload"}
+            yield f"event: done\ndata: {json.dumps(client_done, ensure_ascii=False)}\n\n"
+            continue
+        yield chunk
+
+    if final_payload and settings.live_api_cache_seconds > 0:
+        _cache_set(cache_key, final_payload)
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -129,16 +169,36 @@ def rates_table_page(
     skip_browser: bool | None = Query(None),
     fresh: bool = Query(False),
 ) -> HTMLResponse:
-    """Browser-friendly table view (Provider, Rate, Payment Method, Fee, Notes)."""
+    """Browser table — rows stream in as each provider responds."""
     amount = send_amount or settings.send_amount
     browser_skipped = (
         settings.live_api_skip_browser if skip_browser is None else skip_browser
     )
-    payload = _get_rates_payload(amount, browser_skipped, fresh)
-    max_age = 0 if fresh else settings.live_api_cache_seconds
     return HTMLResponse(
-        render_rates_html(payload),
-        headers={"Cache-Control": f"public, max-age={max_age}"},
+        render_streaming_rates_html(amount, browser_skipped, fresh),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/data/latest_rates/stream")
+def latest_rates_stream(
+    send_amount: float | None = Query(None, ge=1, le=1_000_000),
+    skip_browser: bool | None = Query(None),
+    fresh: bool = Query(False),
+) -> StreamingResponse:
+    """Server-Sent Events — one event per provider as data becomes ready."""
+    amount = send_amount or settings.send_amount
+    browser_skipped = (
+        settings.live_api_skip_browser if skip_browser is None else skip_browser
+    )
+    return StreamingResponse(
+        _iter_rates_sse(amount, browser_skipped, fresh),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

@@ -5,6 +5,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from utils import format_exchange_rate
+
 
 def build_rates_table_rows(payload: dict[str, Any]) -> list[dict[str, Any]]:
     """Build flat table rows: Provider, Rate, Payment Method, Fee, News."""
@@ -162,6 +164,157 @@ def render_rates_html(payload: dict[str, Any]) -> str:
 </html>"""
 
 
+def render_streaming_rates_html(
+    send_amount: float,
+    skip_browser: bool,
+    fresh: bool,
+) -> str:
+    """HTML page that loads rows progressively via SSE."""
+    params = f"send_amount={send_amount}"
+    if skip_browser:
+        params += "&skip_browser=true"
+    if fresh:
+        params += "&fresh=true"
+    stream_url = f"/data/latest_rates/stream?{params}"
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PaisaPathau Live Rates</title>
+  <style>
+    body {{
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      margin: 2rem;
+      color: #1a1a1a;
+      background: #f7f7f8;
+    }}
+    h1 {{ margin-bottom: 0.25rem; }}
+    .meta {{ color: #555; margin-bottom: 1rem; }}
+    .status {{ color: #0f766e; margin-bottom: 1rem; font-weight: 500; }}
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      margin-bottom: 2rem;
+    }}
+    th, td {{
+      border: 1px solid #e5e5e5;
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }}
+    th {{ background: #0f766e; color: #fff; font-weight: 600; }}
+    tr:nth-child(even) td {{ background: #fafafa; }}
+    tr.dim td {{ color: #777; }}
+    tr.new-row td {{ animation: fadeIn 0.35s ease; }}
+    @keyframes fadeIn {{
+      from {{ background: #d1fae5; }}
+      to {{ background: inherit; }}
+    }}
+    .links {{ margin-top: 1rem; }}
+    .links a {{ margin-right: 1rem; }}
+  </style>
+</head>
+<body>
+  <h1>AUD → NPR Live Rates</h1>
+  <p class="meta" id="meta">Send amount: {html.escape(str(send_amount))} AUD</p>
+  <p class="status" id="status">Loading providers…</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Rate</th>
+        <th>Payment Method</th>
+        <th>Fee</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody id="rates-body"></tbody>
+  </table>
+  <p class="links">
+    <a href="/data/latest_rates/stream?{params}">SSE stream</a>
+    <a href="/data/rates_table.json?{params}">Table JSON</a>
+    <a href="/data/latest_rates.json?{params}">Full JSON</a>
+    <a href="/health">Health</a>
+  </p>
+  <script>
+    const tbody = document.getElementById("rates-body");
+    const statusEl = document.getElementById("status");
+    const metaEl = document.getElementById("meta");
+    const seen = new Set();
+    let rowCount = 0;
+
+    function formatRate(value) {{
+      if (value === null || value === undefined) return "—";
+      const factor = 1000;
+      const truncated = Math.trunc(Number(value) * factor) / factor;
+      return truncated.toFixed(3);
+    }}
+
+    function formatFee(value) {{
+      if (value === null || value === undefined) return "—";
+      const n = Number(value);
+      if (n === 0) return "$0 AUD";
+      return "$" + n + " AUD";
+    }}
+
+    function esc(text) {{
+      const d = document.createElement("div");
+      d.textContent = text ?? "";
+      return d.innerHTML;
+    }}
+
+    function appendRow(row) {{
+      const key = row.provider + "|" + (row.payment_method || "") + "|" + (row.status || "ok");
+      if (seen.has(key)) return;
+      seen.add(key);
+      const tr = document.createElement("tr");
+      if (row.status && row.status !== "ok") tr.className = "dim";
+      tr.classList.add("new-row");
+      tr.innerHTML =
+        "<td>" + esc(row.provider) + "</td>" +
+        "<td>" + formatRate(row.rate) + "</td>" +
+        "<td>" + esc(row.payment_method || "—") + "</td>" +
+        "<td>" + formatFee(row.fee) + "</td>" +
+        "<td>" + esc(row.news || "—") + "</td>";
+      tbody.appendChild(tr);
+      rowCount += 1;
+      statusEl.textContent = "Loaded " + rowCount + " row(s)…";
+    }}
+
+    const es = new EventSource("{stream_url}");
+    es.addEventListener("meta", (e) => {{
+      const data = JSON.parse(e.data);
+      metaEl.textContent = "AUD → NPR · send amount: " + data.send_amount +
+        (data.cached ? " · cached" : " · live stream");
+    }});
+    es.addEventListener("table_row", (e) => appendRow(JSON.parse(e.data)));
+    es.addEventListener("error", (e) => {{
+      if (e.data) {{
+        const err = JSON.parse(e.data);
+        console.warn("Provider error:", err);
+      }}
+    }});
+    es.addEventListener("done", (e) => {{
+      const data = JSON.parse(e.data);
+      statusEl.textContent = (data.cached ? "Cached" : "Live") +
+        " · updated " + (data.last_updated || "") +
+        " · " + (data.fetch_duration_seconds || 0) + "s · " +
+        rowCount + " row(s)";
+      es.close();
+    }});
+    es.onerror = () => {{
+      if (es.readyState === EventSource.CLOSED) return;
+      statusEl.textContent = "Stream connection lost";
+      es.close();
+    }};
+  </script>
+</body>
+</html>"""
+
+
 def _row_from_transfer_method(row: dict[str, Any]) -> dict[str, Any]:
     news_parts: list[str] = []
     if row.get("notes"):
@@ -200,7 +353,7 @@ def _format_rate(value: Any) -> str:
     if value is None:
         return "—"
     try:
-        return f"{float(value):.2f}"
+        return format_exchange_rate(float(value), places=3)
     except (TypeError, ValueError):
         return "—"
 

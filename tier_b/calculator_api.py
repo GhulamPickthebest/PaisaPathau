@@ -98,7 +98,7 @@ class CalculatorApiScraper:
             from_currency=from_currency,
             to_currency="NPR",
             send_amount=amount,
-            exchange_rate=round(exchange_rate, 6),
+            exchange_rate=exchange_rate,
             fee=round(fee, 2),
             net_send_amount=net_send,
             receive_amount=round(receive, 2),

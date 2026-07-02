@@ -65,8 +65,9 @@ Health check path: `/health`
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /` | **Table view** — Provider, Rate, Payment Method, Fee, Notes |
-| `GET /data/rates_table.json` | Same data as flat JSON rows |
+| `GET /` | **Streaming table** — rows appear as each provider responds |
+| `GET /data/latest_rates/stream` | **SSE stream** — same progressive data for apps |
+| `GET /data/rates_table.json` | Flat table rows (waits for all providers) |
 | `GET /data/latest_rates.json` | Full rate payload (all providers + corridors) |
 | `GET /data/aud_npr_transfer_methods.json` | AUD→NPR transfer method matrix |
 | `GET /health` | Health check |

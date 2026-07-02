@@ -117,3 +117,23 @@ def compute_receive_amount(
     net_send = round(send_amount - fee, 2)
     receive = round(net_send * exchange_rate, 2)
     return net_send, receive
+
+
+def truncate_decimal(value: float, places: int = 3) -> float:
+    """Truncate a float to *places* decimals without rounding."""
+    factor = 10**places
+    if value >= 0:
+        return int(value * factor) / factor
+    return -int(-value * factor) / factor
+
+
+def format_exchange_rate(value: float | None, places: int = 3) -> str:
+    """Display exchange rate to fixed decimals (truncated, not rounded)."""
+    if value is None:
+        return "—"
+    try:
+        rate = float(value)
+    except (TypeError, ValueError):
+        return "—"
+    truncated = truncate_decimal(rate, places)
+    return f"{truncated:.{places}f}"

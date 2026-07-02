@@ -56,7 +56,7 @@ class OpenExchangeRatesScraper(BaseApiScraper):
             from_currency=from_currency,
             to_currency="NPR",
             send_amount=self.send_amount,
-            exchange_rate=round(rate, 6),
+            exchange_rate=rate,
             fee=fee,
             net_send_amount=net_send,
             receive_amount=receive,

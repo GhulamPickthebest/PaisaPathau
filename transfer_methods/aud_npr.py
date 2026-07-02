@@ -277,11 +277,11 @@ def _worldremit_method_row(
     receive_value = float(calc["receive"]["amount"])
     fee = float(calc["informativeSummary"]["fee"]["value"]["amount"])
     exchange = calc["exchangeRate"]
-    new_rate = round(receive_value / send_value, 6)
+    new_rate = receive_value / send_value
     existing_listed = float(exchange.get("crossedOutValue") or 0)
 
     if existing_listed:
-        existing_rate = round(existing_listed, 6)
+        existing_rate = existing_listed
         existing_receive = round(amount * existing_rate, 2)
         note = f"{notes_prefix}Existing rate from API crossedOutValue"
     else:

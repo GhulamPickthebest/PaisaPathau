@@ -57,7 +57,7 @@ def test_render_rates_html_includes_table_headers():
             "all_rates": [
                 {
                     "provider": "Wise",
-                    "exchange_rate": 105.32,
+                    "exchange_rate": 105.2729,
                     "delivery_method": "Bank Transfer",
                     "fee": 0,
                     "status": "ok",
@@ -67,4 +67,5 @@ def test_render_rates_html_includes_table_headers():
     )
     assert "<th>Provider</th>" in html
     assert "Wise" in html
-    assert "105.32" in html
+    assert "105.272" in html
+    assert "105.273" not in html
