@@ -15,7 +15,7 @@ Railway  →  python main.py --serve  (live_api.py)
         ▼
 GET /data/latest_rates.json
         │
-        ├── Cache hit (< 120s)  → instant response, "cached": true
+        ├── Cache hit (< 60s)  → instant response, "cached": true
         └── Cache miss          → scheduler.fetch_live_payload()
                 │
                 ├── Tier A (APIs)     → Wise, ExchangeRate-API, Open Exchange Rates
@@ -68,7 +68,7 @@ Logs: `logs/scraper.log`
 fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
   .then(r => r.json())
   .then(data => {
-    console.log(data.cached);        // true = served from 120s cache
+    console.log(data.cached);        // true = served from 60s cache
     console.log(data.fetch_mode);    // "live"
     console.log(data.all_rates);
   });
@@ -76,6 +76,8 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 
 | Endpoint | Description |
 |----------|-------------|
+| `GET /` | Table view (Provider, Rate, Payment Method, Fee, Notes) |
+| `GET /data/rates_table.json` | Flat table rows as JSON |
 | `GET /data/latest_rates.json` | Full rate payload |
 | `GET /data/aud_npr_transfer_methods.json` | Transfer method matrix |
 | `GET /health` | Health check |
@@ -86,7 +88,7 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 |-------|---------|-------------|
 | `send_amount` | 1000 | Send amount in source currency |
 | `skip_browser` | `false` on Railway | `true` skips Playwright (faster; WU still works via Wise comparisons API) |
-| `fresh=true` | off | Bypass 120s cache, hit providers immediately |
+| `fresh=true` | off | Bypass 60s cache, hit providers immediately |
 
 ### Railway deployment
 
@@ -102,7 +104,7 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 ```
 LIVE_API_SKIP_BROWSER=false
 LIVE_API_WARM_CACHE=true
-LIVE_API_CACHE_SECONDS=120
+LIVE_API_CACHE_SECONDS=60
 EXCHANGERATE_API_KEY=your_key
 LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```
@@ -115,7 +117,7 @@ Railway injects `PORT` — the app uses it automatically. Health check: `/health
 
 ```
 API_PORT=8000
-LIVE_API_CACHE_SECONDS=120   # avoids Remitly 429 when many visitors load at once
+LIVE_API_CACHE_SECONDS=60   # avoids Remitly 429 when many visitors load at once
 LIVE_API_SKIP_BROWSER=false  # Railway Dockerfile default; true = fast mode without Playwright
 LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```

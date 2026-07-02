@@ -17,7 +17,7 @@ Configured in `railway.toml`, `Procfile`, and `nixpacks.toml`.
 ```
 LIVE_API_SKIP_BROWSER=false
 LIVE_API_WARM_CACHE=true
-LIVE_API_CACHE_SECONDS=120
+LIVE_API_CACHE_SECONDS=60
 EXCHANGERATE_API_KEY=your_key
 PORT                         # set automatically by Railway
 ```
@@ -34,11 +34,11 @@ PORT                         # set automatically by Railway
 |----------|---------------|----------------|
 | Startup warm-up | ~1–3 min (background) | — |
 | First visitor after cache expires | ~1–3 min (with browser scrapers) | `false` |
-| Subsequent visitors within 120s | ~1s | `true` |
+| Subsequent visitors within 60s | ~1s | `true` |
 | `?fresh=true` | ~1–3 min (hits providers) | `false` |
 | `?skip_browser=true` | ~6–25s (API scrapers only) | varies |
 
-Set `LIVE_API_CACHE_SECONDS=120` (or higher) to avoid Remitly rate limits when many users load the site.
+Set `LIVE_API_CACHE_SECONDS=60` (or higher) to avoid Remitly rate limits when many users load the site.
 
 ### Out of memory (OOM) on Railway
 

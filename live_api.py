@@ -9,10 +9,11 @@ from typing import Any
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from config import settings
 from scheduler import fetch_live_payload
+from table_view import build_rates_table_rows, render_rates_html
 from utils import logger
 
 
@@ -111,6 +112,7 @@ def _get_rates_payload(
         skip_browser=skip_browser,
     )
     payload["cached"] = False
+    payload["cache_seconds"] = settings.live_api_cache_seconds
     if settings.live_api_cache_seconds > 0:
         _cache_set(cache_key, payload)
     return payload
@@ -119,6 +121,56 @@ def _get_rates_payload(
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/", response_class=HTMLResponse)
+def rates_table_page(
+    send_amount: float | None = Query(None, ge=1, le=1_000_000),
+    skip_browser: bool | None = Query(None),
+    fresh: bool = Query(False),
+) -> HTMLResponse:
+    """Browser-friendly table view (Provider, Rate, Payment Method, Fee, Notes)."""
+    amount = send_amount or settings.send_amount
+    browser_skipped = (
+        settings.live_api_skip_browser if skip_browser is None else skip_browser
+    )
+    payload = _get_rates_payload(amount, browser_skipped, fresh)
+    max_age = 0 if fresh else settings.live_api_cache_seconds
+    return HTMLResponse(
+        render_rates_html(payload),
+        headers={"Cache-Control": f"public, max-age={max_age}"},
+    )
+
+
+@app.get("/data/rates_table.json")
+def rates_table_json(
+    send_amount: float | None = Query(None, ge=1, le=1_000_000),
+    skip_browser: bool | None = Query(None),
+    fresh: bool = Query(False),
+) -> JSONResponse:
+    """Flat table rows for integrations."""
+    amount = send_amount or settings.send_amount
+    browser_skipped = (
+        settings.live_api_skip_browser if skip_browser is None else skip_browser
+    )
+    payload = _get_rates_payload(amount, browser_skipped, fresh)
+    table_payload = {
+        "last_updated": payload.get("last_updated"),
+        "send_amount": payload.get("send_amount"),
+        "from_currency": "AUD",
+        "to_currency": "NPR",
+        "cached": payload.get("cached", False),
+        "cache_seconds": settings.live_api_cache_seconds,
+        "rows": build_rates_table_rows(payload),
+    }
+    max_age = 0 if fresh else settings.live_api_cache_seconds
+    return JSONResponse(
+        table_payload,
+        headers={
+            "Cache-Control": f"public, max-age={max_age}",
+            "X-Fetch-Mode": "live",
+        },
+    )
 
 
 @app.get("/data/latest_rates.json")

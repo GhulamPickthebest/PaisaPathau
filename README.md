@@ -2,7 +2,7 @@
 
 Production pipeline for **PaisaPathau.com** — fetches live remittance rates from 10+ providers across **all major send currencies → NPR** (AUD, USD, GBP, CAD, NZD, EUR, AED, SAR, SGD + Tier C mid-market).
 
-**Production runs on [Railway](https://railway.app/)** as a live API with on-demand provider fetching and a 120-second server-side cache.
+**Production runs on [Railway](https://railway.app/)** as a live API with on-demand provider fetching and a 60-second server-side cache.
 
 ## Quick Guide
 
@@ -27,7 +27,7 @@ On request (or cache hit):
 ```
 
 - **First request** (cold): ~6–25 seconds — hits provider APIs live
-- **Cached requests** (within 120s): ~1 second — same payload, `"cached": true`
+- **Cached requests** (within 60s): ~1 second — same payload, `"cached": true`
 - **Cache warm-up** on startup when `LIVE_API_WARM_CACHE=true`
 
 ## Features
@@ -52,7 +52,7 @@ python main.py --serve
 ```
 LIVE_API_SKIP_BROWSER=false
 LIVE_API_WARM_CACHE=true
-LIVE_API_CACHE_SECONDS=120
+LIVE_API_CACHE_SECONDS=60
 EXCHANGERATE_API_KEY=your_key
 LIVE_API_CORS_ORIGINS=https://paisapathau.com,https://www.paisapathau.com
 ```
@@ -65,6 +65,8 @@ Health check path: `/health`
 
 | Endpoint | Description |
 |----------|-------------|
+| `GET /` | **Table view** — Provider, Rate, Payment Method, Fee, Notes |
+| `GET /data/rates_table.json` | Same data as flat JSON rows |
 | `GET /data/latest_rates.json` | Full rate payload (all providers + corridors) |
 | `GET /data/aud_npr_transfer_methods.json` | AUD→NPR transfer method matrix |
 | `GET /health` | Health check |
