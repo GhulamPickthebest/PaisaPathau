@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import queue
 import threading
 import time
 from contextlib import asynccontextmanager
@@ -14,9 +15,11 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from config import settings
 from scheduler import fetch_live_payload
-from stream_fetch import iter_cached_sse_events, iter_live_sse_events
-from table_view import build_rates_table_rows, render_rates_html, render_streaming_rates_html
+from stream_fetch import encode_keepalive, encode_sse, iter_cached_sse_events, iter_live_sse_events
+from table_view import build_rates_table_rows, render_streaming_rates_html
 from utils import logger
+
+SSE_KEEPALIVE_SECONDS = 12
 
 
 def _warm_cache_background() -> None:
@@ -135,7 +138,7 @@ def _iter_rates_sse(
     skip_browser: bool,
     fresh: bool,
 ):
-    """Yield SSE chunks; populate cache when a live fetch completes."""
+    """Yield SSE chunks with keepalives; populate cache when a live fetch completes."""
     cache_key = (send_amount, skip_browser)
     if not fresh and settings.live_api_cache_seconds > 0:
         cached = _cache_get(cache_key)
@@ -144,18 +147,51 @@ def _iter_rates_sse(
             yield from iter_cached_sse_events(cached)
             return
 
-    final_payload: dict | None = None
-    for chunk in iter_live_sse_events(send_amount, skip_browser):
-        if chunk.startswith("event: done\n"):
-            done_data = _parse_sse_done_payload(chunk) or {}
-            final_payload = done_data.get("payload")
-            client_done = {k: v for k, v in done_data.items() if k != "payload"}
-            yield f"event: done\ndata: {json.dumps(client_done, ensure_ascii=False)}\n\n"
-            continue
-        yield chunk
+    event_queue: queue.Queue[str | None] = queue.Queue()
+    holder: dict[str, Any] = {"payload": None}
 
-    if final_payload and settings.live_api_cache_seconds > 0:
-        _cache_set(cache_key, final_payload)
+    def producer() -> None:
+        try:
+            for chunk in iter_live_sse_events(send_amount, skip_browser):
+                if chunk.startswith("event: done\n"):
+                    done_data = _parse_sse_done_payload(chunk) or {}
+                    holder["payload"] = done_data.get("payload")
+                    client_done = {k: v for k, v in done_data.items() if k != "payload"}
+                    event_queue.put(
+                        f"event: done\ndata: {json.dumps(client_done, ensure_ascii=False)}\n\n"
+                    )
+                else:
+                    event_queue.put(chunk)
+        except Exception as exc:
+            logger.exception("Stream producer failed: %s", exc)
+            event_queue.put(
+                encode_sse(
+                    "done",
+                    {
+                        "cached": False,
+                        "error": str(exc),
+                        "partial": True,
+                        "total_rates": 0,
+                    },
+                )
+            )
+        finally:
+            event_queue.put(None)
+
+    threading.Thread(target=producer, daemon=True).start()
+
+    while True:
+        try:
+            item = event_queue.get(timeout=SSE_KEEPALIVE_SECONDS)
+        except queue.Empty:
+            yield encode_keepalive()
+            continue
+        if item is None:
+            break
+        yield item
+
+    if holder["payload"] and settings.live_api_cache_seconds > 0:
+        _cache_set(cache_key, holder["payload"])
 
 
 @app.get("/health")

@@ -13,10 +13,10 @@ from constants import STANDARD_TRANSFER_METHODS
 from models import PipelineResult, RateRecord, TransferMethodRow, utc_now_iso
 from output import build_output_payload
 from table_view import (
+    _has_valid_rate,
     _row_from_rate_record,
     _row_from_transfer_method,
     build_rates_table_rows,
-    build_unavailable_table_rows,
 )
 from transfer_methods.aud_npr import (
     _fetch_instarem_rows,
@@ -46,6 +46,20 @@ def encode_sse(event: str, data: dict[str, Any]) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def encode_keepalive() -> str:
+    """SSE comment — keeps proxies/Railway from closing idle connections."""
+    return ": keepalive\n\n"
+
+
+def _table_row_event(row: dict[str, Any]) -> str | None:
+    """Emit table_row only for displayable live rates."""
+    if row.get("status") not in (None, "ok"):
+        return None
+    if not _has_valid_rate(row):
+        return None
+    return encode_sse("table_row", {**row, "status": "ok"})
+
+
 def iter_cached_sse_events(payload: dict[str, Any]) -> Iterator[str]:
     """Replay a cached payload as SSE events (instant)."""
     yield encode_sse(
@@ -59,9 +73,9 @@ def iter_cached_sse_events(payload: dict[str, Any]) -> Iterator[str]:
         },
     )
     for row in build_rates_table_rows(payload):
-        yield encode_sse("table_row", {**row, "status": "ok"})
-    for row in build_unavailable_table_rows(payload):
-        yield encode_sse("table_row", {**row, "status": row.get("status", "unavailable")})
+        event = _table_row_event(row)
+        if event:
+            yield event
     yield encode_sse(
         "done",
         {
@@ -78,6 +92,25 @@ def iter_live_sse_events(
     skip_browser: bool,
 ) -> Iterator[str]:
     """Fetch providers in parallel and yield SSE events as each completes."""
+    try:
+        yield from _iter_live_sse_events_impl(send_amount, skip_browser)
+    except Exception as exc:
+        logger.exception("Live SSE stream failed: %s", exc)
+        yield encode_sse(
+            "done",
+            {
+                "cached": False,
+                "error": str(exc),
+                "partial": True,
+                "total_rates": 0,
+            },
+        )
+
+
+def _iter_live_sse_events_impl(
+    send_amount: float,
+    skip_browser: bool,
+) -> Iterator[str]:
     started = time.perf_counter()
     amount = send_amount or settings.send_amount
     all_records: list[RateRecord] = []
@@ -130,17 +163,10 @@ def iter_live_sse_events(
             try:
                 records = scraper_cls(send_amount=amount).fetch_all()
                 all_records.extend(records)
-                for record in records:
-                    yield encode_sse("rate", record.to_dict())
-                    yield encode_sse(
-                        "table_row",
-                        {**_row_from_rate_record(record.to_dict()), "status": record.status},
-                    )
             except Exception as exc:
                 msg = f"Tier B {name} failed: {exc}"
                 logger.error(msg)
                 all_errors.append(msg)
-                yield encode_sse("error", {"source": name, "message": str(exc)})
 
         for future in as_completed(futures):
             kind, label = futures[future]
@@ -150,60 +176,52 @@ def iter_live_sse_events(
                 msg = f"{label} failed: {exc}"
                 logger.error(msg)
                 all_errors.append(msg)
-                yield encode_sse("error", {"source": label, "message": str(exc)})
                 continue
 
             if kind == "transfer_method":
                 for row in result:
                     transfer_row_objs.append(row)
-                    table_row = _row_from_transfer_method(row.to_dict())
-                    yield encode_sse("table_row", {**table_row, "status": "ok"})
+                    row_dict = row.to_dict()
+                    if row_dict.get("status") != "ok":
+                        continue
+                    table_row = _row_from_transfer_method(row_dict)
+                    event = _table_row_event(table_row)
+                    if event:
+                        yield event
                 continue
 
             for record in result:
                 all_records.append(record)
-                yield encode_sse("rate", record.to_dict())
+                if record.status != "ok":
+                    continue
                 if (
-                    record.status == "ok"
-                    and kind == "tier_b_rate"
+                    kind == "tier_b_rate"
                     and record.provider not in _MATRIX_TABLE_PROVIDERS
                 ):
-                    yield encode_sse(
-                        "table_row",
-                        {**_row_from_rate_record(record.to_dict()), "status": "ok"},
-                    )
+                    event = _table_row_event(_row_from_rate_record(record.to_dict()))
+                    if event:
+                        yield event
 
     if not skip_browser:
         for scraper_cls in BROWSER_SCRAPERS:
             name = scraper_cls.provider_name
+            yield encode_sse("progress", {"provider": name, "phase": "browser"})
+            yield encode_keepalive()
             try:
                 with SharedBrowser() as browser:
                     scraper = scraper_cls(browser=browser, send_amount=amount)
                     records = scraper.fetch_all()
                 for record in records:
                     all_records.append(record)
-                    yield encode_sse("rate", record.to_dict())
-                    table_row = _row_from_rate_record(record.to_dict())
-                    yield encode_sse("table_row", {**table_row, "status": record.status})
+                    if record.status != "ok":
+                        continue
+                    event = _table_row_event(_row_from_rate_record(record.to_dict()))
+                    if event:
+                        yield event
             except Exception as exc:
                 msg = f"Tier B {name} failed: {exc}"
                 logger.error(msg)
                 all_errors.append(msg)
-                yield encode_sse("error", {"source": name, "message": str(exc)})
-
-    for row in _unavailable_rows(transfer_row_objs, amount):
-        row_dict = row.to_dict()
-        yield encode_sse(
-            "table_row",
-            {
-                "provider": row_dict["provider"],
-                "rate": None,
-                "payment_method": row_dict["transfer_method"],
-                "fee": row_dict.get("fee"),
-                "news": row_dict.get("status", "unavailable"),
-                "status": row_dict.get("status", "unavailable"),
-            },
-        )
 
     transfer_matrix = {
         "last_updated": utc_now_iso(),

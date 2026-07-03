@@ -8,18 +8,33 @@ from typing import Any
 from utils import format_exchange_rate
 
 
+def _has_valid_rate(row: dict[str, Any]) -> bool:
+    """True when a row has a positive exchange rate worth displaying."""
+    rate = row.get("new_user_rate")
+    if rate is None:
+        rate = row.get("rate")
+    if rate is None:
+        rate = row.get("exchange_rate")
+    try:
+        return rate is not None and float(rate) > 0
+    except (TypeError, ValueError):
+        return False
+
+
 def build_rates_table_rows(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    """Build flat table rows: Provider, Rate, Payment Method, Fee, News."""
+    """Build flat table rows — only providers with live rates."""
     matrix = payload.get("aud_npr_transfer_methods") or {}
     matrix_rows = [
-        row for row in matrix.get("rows", []) if row.get("status") == "ok"
+        row
+        for row in matrix.get("rows", [])
+        if row.get("status") == "ok" and _has_valid_rate(row)
     ]
     if matrix_rows:
         return [_row_from_transfer_method(row) for row in matrix_rows]
 
     rows: list[dict[str, Any]] = []
     for record in payload.get("all_rates", []):
-        if record.get("status") != "ok":
+        if record.get("status") != "ok" or not _has_valid_rate(record):
             continue
         rows.append(_row_from_rate_record(record))
     return rows
@@ -63,7 +78,6 @@ def build_unavailable_table_rows(payload: dict[str, Any]) -> list[dict[str, Any]
 def render_rates_html(payload: dict[str, Any]) -> str:
     """Render a simple HTML table for browser viewing."""
     rows = build_rates_table_rows(payload)
-    unavailable = build_unavailable_table_rows(payload)
     send_amount = payload.get("send_amount", "")
     last_updated = payload.get("last_updated", "")
     cached = payload.get("cached", False)
@@ -82,24 +96,6 @@ def render_rates_html(payload: dict[str, Any]) -> str:
     body_rows = "".join(_html_row(row) for row in rows) or (
         "<tr><td colspan='5'>No live rates available</td></tr>"
     )
-    unavailable_section = ""
-    if unavailable:
-        unavail_rows = "".join(_html_row(row, dim=True) for row in unavailable)
-        unavailable_section = f"""
-        <h2>Unavailable</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Provider</th>
-              <th>Rate</th>
-              <th>Payment Method</th>
-              <th>Fee</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>{unavail_rows}</tbody>
-        </table>
-        """
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -154,7 +150,6 @@ def render_rates_html(payload: dict[str, Any]) -> str:
     </thead>
     <tbody>{body_rows}</tbody>
   </table>
-  {unavailable_section}
   <p class="links">
     <a href="/data/rates_table.json">Table JSON</a>
     <a href="/data/latest_rates.json">Full JSON</a>
@@ -245,6 +240,7 @@ def render_streaming_rates_html(
     const metaEl = document.getElementById("meta");
     const seen = new Set();
     let rowCount = 0;
+    let doneReceived = false;
 
     function formatRate(value) {{
       if (value === null || value === undefined) return "—";
@@ -267,11 +263,12 @@ def render_streaming_rates_html(
     }}
 
     function appendRow(row) {{
-      const key = row.provider + "|" + (row.payment_method || "") + "|" + (row.status || "ok");
+      if (row.status && row.status !== "ok") return;
+      if (row.rate === null || row.rate === undefined || Number(row.rate) <= 0) return;
+      const key = row.provider + "|" + (row.payment_method || "");
       if (seen.has(key)) return;
       seen.add(key);
       const tr = document.createElement("tr");
-      if (row.status && row.status !== "ok") tr.className = "dim";
       tr.classList.add("new-row");
       tr.innerHTML =
         "<td>" + esc(row.provider) + "</td>" +
@@ -291,13 +288,13 @@ def render_streaming_rates_html(
         (data.cached ? " · cached" : " · live stream");
     }});
     es.addEventListener("table_row", (e) => appendRow(JSON.parse(e.data)));
-    es.addEventListener("error", (e) => {{
-      if (e.data) {{
-        const err = JSON.parse(e.data);
-        console.warn("Provider error:", err);
-      }}
+    es.addEventListener("progress", (e) => {{
+      const data = JSON.parse(e.data);
+      statusEl.textContent = "Fetching " + (data.provider || "provider") +
+        "… (" + rowCount + " row(s) loaded)";
     }});
     es.addEventListener("done", (e) => {{
+      doneReceived = true;
       const data = JSON.parse(e.data);
       statusEl.textContent = (data.cached ? "Cached" : "Live") +
         " · updated " + (data.last_updated || "") +
@@ -306,9 +303,16 @@ def render_streaming_rates_html(
       es.close();
     }});
     es.onerror = () => {{
-      if (es.readyState === EventSource.CLOSED) return;
-      statusEl.textContent = "Stream connection lost";
-      es.close();
+      if (doneReceived) return;
+      if (es.readyState === EventSource.CONNECTING) {{
+        statusEl.textContent = "Still loading… (" + rowCount + " row(s) so far)";
+        return;
+      }}
+      if (rowCount > 0) {{
+        statusEl.textContent = "Loaded " + rowCount + " row(s) · stream ended";
+        return;
+      }}
+      statusEl.textContent = "Connecting to live rates…";
     }};
   </script>
 </body>
