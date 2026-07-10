@@ -215,7 +215,7 @@ def render_streaming_rates_html(
 <body>
   <h1>AUD → NPR Live Rates</h1>
   <p class="meta" id="meta">Send amount: {html.escape(str(send_amount))} AUD</p>
-  <p class="status" id="status">Loading providers…</p>
+  <p class="status" id="status">Loading rates from snapshot…</p>
   <table>
     <thead>
       <tr>
@@ -285,7 +285,7 @@ def render_streaming_rates_html(
     es.addEventListener("meta", (e) => {{
       const data = JSON.parse(e.data);
       metaEl.textContent = "AUD → NPR · send amount: " + data.send_amount +
-        (data.cached ? " · cached" : " · live stream");
+        " · snapshot (refreshes every 60s)";
     }});
     es.addEventListener("table_row", (e) => appendRow(JSON.parse(e.data)));
     es.addEventListener("progress", (e) => {{
@@ -296,10 +296,9 @@ def render_streaming_rates_html(
     es.addEventListener("done", (e) => {{
       doneReceived = true;
       const data = JSON.parse(e.data);
-      statusEl.textContent = (data.cached ? "Cached" : "Live") +
+      statusEl.textContent = (data.cached ? "Snapshot" : "Live") +
         " · updated " + (data.last_updated || "") +
-        " · " + (data.fetch_duration_seconds || 0) + "s · " +
-        rowCount + " row(s)";
+        " · " + rowCount + " row(s)";
       es.close();
     }});
     es.onerror = () => {{

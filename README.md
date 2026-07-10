@@ -2,7 +2,7 @@
 
 Production pipeline for **PaisaPathau.com** — fetches live remittance rates from 10+ providers across **all major send currencies → NPR** (AUD, USD, GBP, CAD, NZD, EUR, AED, SAR, SGD + Tier C mid-market).
 
-**Production runs on [Railway](https://railway.app/)** as a live API with on-demand provider fetching and a 60-second server-side cache.
+**Production runs on [Railway](https://railway.app/)** with a background worker (60s refresh) and a read-only API.
 
 ## Quick Guide
 

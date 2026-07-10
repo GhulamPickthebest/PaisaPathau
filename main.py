@@ -23,7 +23,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--serve",
         action="store_true",
-        help="Start live API server (fetches provider rates on each request)",
+        help="Start live API server (background snapshot + read-only endpoints)",
     )
     parser.add_argument(
         "--interval",
@@ -60,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
 
             port = args.port or settings.api_port
             logger.info(
-                "Starting live API on port %s (cache=%ss, skip_browser=%s)",
+                "Starting live API on port %s (snapshot refresh=%ss, skip_browser=%s)",
                 port,
                 settings.live_api_cache_seconds,
                 settings.live_api_skip_browser,

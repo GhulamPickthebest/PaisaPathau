@@ -7,26 +7,22 @@ Concise setup, API keys, and pipeline flow for the live rates API (Railway produ
 ## How It Works (production)
 
 ```
+Background worker (every 60s)
+        │
+        ▼
+Fetch all providers → merge with last good rates → save snapshot
+        │
+        ▼
 WordPress / frontend
         │
         ▼
-Railway  →  python main.py --serve  (live_api.py)
+Railway API (read-only) → python main.py --serve
         │
         ▼
-GET /data/latest_rates.json
-        │
-        ├── Cache hit (< 60s)  → instant response, "cached": true
-        └── Cache miss          → scheduler.fetch_live_payload()
-                │
-                ├── Tier A (APIs)     → Wise, ExchangeRate-API, Open Exchange Rates
-                ├── Tier B (API)      → Remitly, WorldRemit, Instarem, …
-                └── Tier C (API)      → QAR, KWD, JPY, EUR, … mid-market
-                │
-                ▼
-        JSON response (~6–25s first fetch, ~1s cached)
+GET /data/latest_rates.json  (instant, from snapshot)
 ```
 
-Each provider runs independently. Failures get `"status": "error"`; others continue. Transient errors retry 3 times.
+Visitors never trigger a live scrape. The worker refreshes every **60 seconds** (`LIVE_API_CACHE_SECONDS`).
 
 **No scheduled batch scraper** — rates are fetched on demand and cached on the server. GitHub Actions batch workflow is manual-only (legacy).
 
@@ -89,7 +85,7 @@ fetch('https://YOUR-APP.up.railway.app/data/latest_rates.json')
 |-------|---------|-------------|
 | `send_amount` | 1000 | Send amount in source currency |
 | `skip_browser` | `false` on Railway | `true` skips Playwright (faster; WU still works via Wise comparisons API) |
-| `fresh=true` | off | Bypass 60s cache, hit providers immediately |
+| `fresh=true` | ignored | API always serves stored snapshot |
 
 ### Railway deployment
 
