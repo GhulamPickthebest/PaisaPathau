@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from constants import WU_LOCALE, active_corridors
 from tier_b.calculator_api import CalculatorApiScraper
-from tier_b.wise_comparison import fetch_comparison_quote
-from tier_b.wise_transfer import _format_delivery
+from tier_b.wise_comparison import fetch_comparison_quote, format_delivery_duration
 
 WU_COMPARISON_ALIAS = "western-union"
 
@@ -22,7 +21,7 @@ class WesternUnionApiScraper(CalculatorApiScraper):
             send_amount=self.send_amount,
         )
         speed = (
-            _format_delivery(quote.get("delivery") or {})
+            format_delivery_duration(quote.get("delivery") or {})
             or "Minutes to 3 business days"
         )
         return self._build_record(

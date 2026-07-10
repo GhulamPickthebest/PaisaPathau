@@ -188,11 +188,22 @@ def _fetch_and_build_payload(
             all_records, all_errors = tiers_future.result()
             transfer_matrix = matrix_future.result()
     else:
-        all_records, all_errors = _fetch_all_tiers(amount, skip_browser)
-        transfer_matrix = fetch_aud_npr_transfer_methods(
-            send_amount=amount,
-            skip_browser=skip_browser,
-        )
+        # Browser scrapers first; API quotes last so they match the website at save time.
+        browser_records, browser_errors = _fetch_browser_tiers(amount)
+        all_records.extend(browser_records)
+        all_errors.extend(browser_errors)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            api_future = executor.submit(_fetch_api_tiers, amount)
+            matrix_future = executor.submit(
+                fetch_aud_npr_transfer_methods,
+                send_amount=amount,
+                skip_browser=True,
+            )
+            api_records, api_errors = api_future.result()
+            transfer_matrix = matrix_future.result()
+        all_records.extend(api_records)
+        all_errors.extend(api_errors)
 
     result = PipelineResult(all_rates=all_records, errors=all_errors)
     payload = build_output_payload(result, amount, transfer_matrix)
@@ -201,6 +212,48 @@ def _fetch_and_build_payload(
     if transfer_matrix.get("errors"):
         payload.setdefault("errors", []).extend(transfer_matrix["errors"])
     return result, payload
+
+
+def _fetch_api_tiers(amount: float) -> tuple[list[RateRecord], list[str]]:
+    all_records: list[RateRecord] = []
+    all_errors: list[str] = []
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {
+            executor.submit(fetch_tier_a, amount): "tier_a",
+            executor.submit(fetch_tier_b, amount, skip_browser=True): "tier_b_api",
+            executor.submit(fetch_tier_c, amount): "tier_c",
+        }
+        for future in as_completed(futures):
+            try:
+                records, errors = future.result()
+                all_records.extend(records)
+                all_errors.extend(errors)
+            except Exception as exc:
+                label = futures[future]
+                msg = f"{label} failed: {exc}"
+                logger.error(msg)
+                all_errors.append(msg)
+
+    return all_records, all_errors
+
+
+def _fetch_browser_tiers(amount: float) -> tuple[list[RateRecord], list[str]]:
+    records: list[RateRecord] = []
+    errors: list[str] = []
+
+    for scraper_cls in BROWSER_SCRAPERS:
+        name = scraper_cls.provider_name
+        try:
+            with SharedBrowser() as browser:
+                scraper = scraper_cls(browser=browser, send_amount=amount)
+                records.extend(scraper.fetch_all())
+        except Exception as exc:
+            msg = f"Tier B {name} failed: {exc}"
+            logger.error(msg)
+            errors.append(msg)
+
+    return records, errors
 
 
 def _fetch_all_tiers(

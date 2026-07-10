@@ -18,6 +18,14 @@ HEADERS = {
 }
 
 
+def format_delivery_duration(duration: dict) -> str:
+    min_d = duration.get("min") or ""
+    max_d = duration.get("max") or ""
+    if min_d and max_d and min_d != max_d:
+        return f"{min_d} - {max_d}"
+    return min_d or max_d or ""
+
+
 @retry(exceptions=(requests.RequestException, ValueError, KeyError))
 def fetch_comparison_quote(
     provider_alias: str,

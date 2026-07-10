@@ -29,6 +29,7 @@ class Settings:
     log_file: str
     api_port: int
     live_api_cache_seconds: int
+    live_api_fast_refresh_seconds: int
     live_api_skip_browser: bool
     live_api_cors_origins: str
     live_api_warm_cache: bool
@@ -50,6 +51,9 @@ class Settings:
             log_file=os.getenv("LOG_FILE", str(LOGS_DIR / "scraper.log")),
             api_port=int(os.getenv("PORT", os.getenv("API_PORT", "8000"))),
             live_api_cache_seconds=int(os.getenv("LIVE_API_CACHE_SECONDS", "60")),
+            live_api_fast_refresh_seconds=int(
+                os.getenv("LIVE_API_FAST_REFRESH_SECONDS", "20")
+            ),
             live_api_skip_browser=os.getenv("LIVE_API_SKIP_BROWSER", "true").lower()
             == "true",
             live_api_cors_origins=os.getenv("LIVE_API_CORS_ORIGINS", "*"),

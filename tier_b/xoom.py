@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from constants import XOOM_LOCALE, active_corridors
 from tier_b.calculator_api import CalculatorApiScraper
-from tier_b.wise_comparison import fetch_comparison_quote
-from tier_b.wise_transfer import _format_delivery
+from tier_b.wise_comparison import fetch_comparison_quote, format_delivery_duration
 
 
 class XoomScraper(CalculatorApiScraper):
@@ -18,7 +17,7 @@ class XoomScraper(CalculatorApiScraper):
             from_currency,
             send_amount=self.send_amount,
         )
-        speed = _format_delivery(quote.get("delivery") or {}) or "Minutes to 3 business days"
+        speed = format_delivery_duration(quote.get("delivery") or {}) or "Minutes to 3 business days"
         return self._build_record(
             from_currency=from_currency,
             exchange_rate=quote["rate"],

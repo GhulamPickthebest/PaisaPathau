@@ -22,7 +22,7 @@ from models import TransferMethodRow, utc_now_iso
 from tier_b.instarem import parse_instarem_computed_payload
 from tier_b.western_union_transfer_methods import WesternUnionTransferMethodsScraper
 from tier_b.wise_comparison import fetch_comparison_quote
-from tier_b.wise_transfer import _format_delivery
+from tier_b.wise_quotes import fetch_wise_transfer_quote
 from tier_b.worldremit import CREATE_CALCULATION, WORLDREMIT_COUNTRY
 from utils import logger
 
@@ -30,8 +30,6 @@ REMITLY_API = "https://api.remitly.io/v3/calculator/estimate"
 WORLDREMIT_GQL = "https://api.worldremit.com/graphql"
 INSTAREM_FEE_URL = "https://www.instarem.com/api/v1/public/payment-method/fee"
 INSTAREM_COMPUTED_URL = "https://www.instarem.com/api/v1/public/transaction/computed-value"
-WISE_COMPARISONS = "https://wise.com/gateway/v4/comparisons"
-
 WORLDREMIT_PAY_OUT_METHODS_QUERY = """
 query payOutMethods($payOutMethodsInput: PayOutMethodsInput!) {
   payOutMethods(payOutMethodsInput: $payOutMethodsInput) {
@@ -402,32 +400,19 @@ def _fetch_instarem_rows(amount: float) -> list[TransferMethodRow]:
 
 
 def _fetch_wise_rows(amount: float) -> list[TransferMethodRow]:
-    response = requests.get(
-        WISE_COMPARISONS,
-        params={
-            "sourceCurrency": "AUD",
-            "targetCurrency": "NPR",
-            "sendAmount": amount,
-        },
-        timeout=25,
-        headers={"User-Agent": "Mozilla/5.0"},
-    )
-    response.raise_for_status()
-    data = response.json()
-    wise = next(
-        (p for p in data.get("providers", []) if p.get("alias") == "wise"),
-        None,
-    )
-    if not wise or not wise.get("quotes"):
-        raise ValueError("Wise comparison quote unavailable for AUD/NPR")
-
-    quote = wise["quotes"][0]
+    quote = fetch_wise_transfer_quote("AUD", send_amount=amount)
     rate = float(quote["rate"])
-    fee = float(quote.get("fee") or 0)
-    receive = float(quote.get("receivedAmount") or 0)
-    duration = quote.get("deliveryEstimation", {}).get("duration") or {}
-    fastest = _format_iso_duration(duration.get("min")) or _speeds("Wise")[0]
-    slowest = _format_iso_duration(duration.get("max")) or _speeds("Wise")[1]
+    fee = float(quote["fee"])
+    receive = float(quote["receive_amount"])
+    delivery = quote.get("delivery") or ""
+    fastest, slowest = _speeds("Wise")
+    if delivery:
+        fastest = delivery
+        slowest = delivery
+    rate_ts = quote.get("rate_timestamp")
+    notes = "Wise v3 calculator quote (wise.com gateway)"
+    if rate_ts:
+        notes = f"{notes}; rate as of {rate_ts}"
 
     return [
         TransferMethodRow(
@@ -443,7 +428,7 @@ def _fetch_wise_rows(amount: float) -> list[TransferMethodRow]:
             send_amount=amount,
             receive_amount_new=receive,
             receive_amount_existing=receive,
-            notes="Wise public transfer quote; no new/existing rate split on this endpoint",
+            notes=notes,
         )
     ]
 
