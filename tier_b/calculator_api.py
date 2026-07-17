@@ -9,7 +9,8 @@ import requests
 
 from config import settings
 from models import RateRecord, utc_now_iso
-from utils import logger, retry
+from provider_cooldown import is_cooling_down, mark_rate_limited, remaining_seconds
+from utils import logger, retry, PermanentScraperError
 
 DEFAULT_HEADERS = {
     "User-Agent": (
@@ -35,6 +36,24 @@ class CalculatorApiScraper:
         self.session.headers.update(DEFAULT_HEADERS)
 
     def fetch_all(self) -> list[RateRecord]:
+        if is_cooling_down(self.provider_name):
+            wait = remaining_seconds(self.provider_name)
+            logger.warning(
+                "%s skipped — cooling down %ss after rate limit",
+                self.provider_name,
+                wait,
+            )
+            return [
+                RateRecord.error_record(
+                    self.provider_name,
+                    currency,
+                    self.send_amount,
+                    source=self.source_label,
+                    error_message=f"Rate limited; retry in {wait}s",
+                )
+                for currency in self.corridors
+            ]
+
         records: list[RateRecord] = []
         for currency in self.corridors:
             try:
@@ -42,6 +61,17 @@ class CalculatorApiScraper:
                 records.extend(corridor_records)
                 if any(r.status == "ok" for r in corridor_records):
                     logger.info("%s %s -> NPR: ok", self.provider_name, currency)
+            except PermanentScraperError as exc:
+                logger.error("%s %s failed: %s", self.provider_name, currency, exc)
+                records.append(
+                    RateRecord.error_record(
+                        self.provider_name,
+                        currency,
+                        self.send_amount,
+                        source=self.source_label,
+                        error_message=str(exc),
+                    )
+                )
             except Exception as exc:
                 logger.error("%s %s failed: %s", self.provider_name, currency, exc)
                 records.append(
@@ -66,8 +96,10 @@ class CalculatorApiScraper:
     def _get_json(self, url: str, **kwargs: Any) -> dict[str, Any]:
         response = self.session.get(url, timeout=25, **kwargs)
         if response.status_code == 429:
-            time.sleep(2)
-            response = self.session.get(url, timeout=25, **kwargs)
+            mark_rate_limited(self.provider_name, seconds=300)
+            raise PermanentScraperError(
+                f"{self.provider_name} rate limited (429); cooling down 300s"
+            )
         response.raise_for_status()
         data = response.json()
         if isinstance(data, list) and data and "error_key" in data[0]:

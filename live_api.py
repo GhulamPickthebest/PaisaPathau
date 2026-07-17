@@ -74,11 +74,24 @@ def _get_snapshot_payload() -> dict[str, Any]:
 @app.get("/health")
 def health() -> dict[str, Any]:
     payload = snapshot_store.get()
+    age = snapshot_store.age_seconds()
+    stale_after = max(120, settings.live_api_cache_seconds * 3)
+    is_stale = age is not None and age > stale_after
+    if not payload:
+        status = "warming"
+    elif is_stale:
+        status = "stale"
+    else:
+        status = "ok"
     return {
-        "status": "ok" if payload else "warming",
+        "status": status,
         "snapshot_ready": payload is not None,
-        "snapshot_age_seconds": snapshot_store.age_seconds(),
+        "snapshot_age_seconds": age,
+        "snapshot_stale": is_stale,
+        "last_updated": (payload or {}).get("last_updated"),
+        "refresh_kind": (payload or {}).get("refresh_kind"),
         "refresh_seconds": settings.live_api_cache_seconds,
+        "browser_refresh_seconds": settings.live_api_browser_refresh_seconds,
     }
 
 

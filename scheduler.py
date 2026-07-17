@@ -189,7 +189,7 @@ def _fetch_and_build_payload(
             transfer_matrix = matrix_future.result()
     else:
         # Browser scrapers first; API quotes last so they match the website at save time.
-        browser_records, browser_errors = _fetch_browser_tiers(amount)
+        browser_records, browser_errors = fetch_browser_tiers(amount)
         all_records.extend(browser_records)
         all_errors.extend(browser_errors)
 
@@ -238,7 +238,8 @@ def _fetch_api_tiers(amount: float) -> tuple[list[RateRecord], list[str]]:
     return all_records, all_errors
 
 
-def _fetch_browser_tiers(amount: float) -> tuple[list[RateRecord], list[str]]:
+def fetch_browser_tiers(amount: float) -> tuple[list[RateRecord], list[str]]:
+    """Fetch Playwright-based providers only (one browser at a time)."""
     records: list[RateRecord] = []
     errors: list[str] = []
 
@@ -254,6 +255,10 @@ def _fetch_browser_tiers(amount: float) -> tuple[list[RateRecord], list[str]]:
             errors.append(msg)
 
     return records, errors
+
+
+# Backwards-compatible alias
+_fetch_browser_tiers = fetch_browser_tiers
 
 
 def _fetch_all_tiers(

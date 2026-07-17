@@ -19,12 +19,13 @@ from constants import (
     WORLDREMIT_WALLET_ALIAS_CODE,
 )
 from models import TransferMethodRow, utc_now_iso
+from provider_cooldown import is_cooling_down, mark_rate_limited, remaining_seconds
 from tier_b.instarem import parse_instarem_computed_payload
 from tier_b.western_union_transfer_methods import WesternUnionTransferMethodsScraper
 from tier_b.wise_comparison import fetch_comparison_quote
 from tier_b.wise_quotes import fetch_wise_transfer_quote
 from tier_b.worldremit import CREATE_CALCULATION, WORLDREMIT_COUNTRY
-from utils import logger
+from utils import PermanentScraperError, logger
 
 REMITLY_API = "https://api.remitly.io/v3/calculator/estimate"
 WORLDREMIT_GQL = "https://api.worldremit.com/graphql"
@@ -105,6 +106,10 @@ def _speeds(provider: str) -> tuple[str, str]:
 
 
 def _remitly_fetch(amount: float, strict_promo: bool) -> dict:
+    if is_cooling_down("Remitly"):
+        wait = remaining_seconds("Remitly")
+        raise PermanentScraperError(f"Remitly rate limited; retry in {wait}s")
+
     conduit = quote("AUS:AUD-NPL:NPR", safe="")
     url = (
         f"{REMITLY_API}?conduit={conduit}&anchor=SEND&amount={int(amount)}"
@@ -113,6 +118,9 @@ def _remitly_fetch(amount: float, strict_promo: bool) -> dict:
         f"&strict_promo={'true' if strict_promo else 'false'}"
     )
     response = requests.get(url, timeout=25, headers={"User-Agent": "Mozilla/5.0"})
+    if response.status_code == 429:
+        mark_rate_limited("Remitly", seconds=300)
+        raise PermanentScraperError("Remitly rate limited (429); cooling down 300s")
     response.raise_for_status()
     data = response.json()
     if isinstance(data, list):
