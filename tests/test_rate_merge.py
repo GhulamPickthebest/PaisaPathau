@@ -37,6 +37,41 @@ def test_merge_rate_records_keeps_previous_ok_on_error():
     assert merged[0]["timestamp"] == "2026-07-18T01:00:00+00:00"
 
 
+def test_merge_rate_records_carry_forward_without_false_fallback():
+    """Browser quotes omitted from an API-only refresh must not become fallback."""
+    previous = [
+        {
+            "provider": "Xe Money Transfer",
+            "from_currency": "AUD",
+            "customer_type": "",
+            "rate_label": "",
+            "status": "ok",
+            "exchange_rate": 104.0,
+            "receive_amount": 104000.0,
+            "timestamp": "2026-07-19T01:00:00+00:00",
+            "is_fallback": False,
+            "quote_freshness": "live",
+        }
+    ]
+    new = [
+        {
+            "provider": "Wise",
+            "from_currency": "AUD",
+            "customer_type": "",
+            "rate_label": "",
+            "status": "ok",
+            "exchange_rate": 106.0,
+            "receive_amount": 104700.0,
+            "fee": 14.0,
+        }
+    ]
+    merged = merge_rate_records(new, previous)
+    by_provider = {row["provider"]: row for row in merged}
+    assert by_provider["Xe Money Transfer"]["is_fallback"] is False
+    assert by_provider["Xe Money Transfer"]["quote_freshness"] == "live"
+    assert by_provider["Wise"]["is_fallback"] is False
+
+
 def test_merge_rate_records_omits_error_without_previous():
     new = [
         {

@@ -11,7 +11,12 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from background_worker import start_snapshot_worker
 from config import settings
-from public_quotes import build_admin_diagnostics, build_public_rates_payload
+from public_quotes import (
+    build_admin_diagnostics,
+    build_public_rates_payload,
+    is_valid_public_quote,
+    sanitize_all_rates_for_public,
+)
 from snapshot_store import snapshot_store
 from stream_fetch import iter_cached_sse_events
 from table_view import render_streaming_rates_html
@@ -168,10 +173,24 @@ def latest_rates(
     fresh: bool = Query(False, description="Ignored — API always serves stored snapshot"),
 ) -> JSONResponse:
     payload = _get_snapshot_payload()
-    # Full snapshot for debugging, plus the consumer-ready public table.
+    public_table = build_public_rates_payload(payload)
+    admin = build_admin_diagnostics(payload)
+    # Consumer-safe body: no error/zero/mid-market rows in all_rates.
     enriched = dict(payload)
-    enriched["public_table"] = build_public_rates_payload(payload)
-    enriched["admin"] = build_admin_diagnostics(payload)
+    enriched["all_rates"] = sanitize_all_rates_for_public(payload)
+    matrix = dict(payload.get("aud_npr_transfer_methods") or {})
+    if matrix:
+        matrix = dict(matrix)
+        matrix["rows"] = [
+            row
+            for row in matrix.get("rows", [])
+            if is_valid_public_quote(row)
+        ]
+        enriched["aud_npr_transfer_methods"] = matrix
+    enriched["public_table"] = public_table
+    enriched["admin"] = admin
+    # Prefer public_table.rows for the website; all_rates is cleaned remittance quotes only.
+    enriched["errors"] = admin.get("errors", [])
     return JSONResponse(
         enriched,
         headers={

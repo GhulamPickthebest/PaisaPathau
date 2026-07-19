@@ -356,13 +356,17 @@ def build_admin_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
     """Errors and invalid/unavailable rows for health/admin only."""
     errors = list(payload.get("errors") or [])
     unavailable: list[dict[str, Any]] = []
+    seen_providers: set[str] = set()
+
     for record in payload.get("all_rates", []):
+        provider = str(record.get("provider") or "")
         if record.get("status") == "error" or not is_valid_public_quote(record):
             if record.get("status") == "ok" and is_valid_public_quote(record):
                 continue
+            seen_providers.add(provider)
             unavailable.append(
                 {
-                    "provider": record.get("provider"),
+                    "provider": provider,
                     "status": record.get("status"),
                     "error_message": record.get("error_message")
                     or ("invalid quote" if record.get("status") == "ok" else "error"),
@@ -371,19 +375,46 @@ def build_admin_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
                     "receive_amount": record.get("receive_amount"),
                 }
             )
+        elif provider.startswith("Wise (mid-market)"):
+            seen_providers.add(provider)
+            unavailable.append(
+                {
+                    "provider": provider,
+                    "status": "reference_only",
+                    "error_message": "Mid-market FX reference — excluded from public comparison table",
+                    "timestamp": record.get("timestamp"),
+                    "exchange_rate": record.get("exchange_rate"),
+                    "receive_amount": record.get("receive_amount"),
+                }
+            )
+
     matrix = payload.get("aud_npr_transfer_methods") or {}
     for row in matrix.get("rows", []):
         if row.get("status") in ("unavailable", "error") or not is_valid_public_quote(row):
             if row.get("status") == "ok" and is_valid_public_quote(row):
                 continue
+            provider = str(row.get("provider") or "")
+            seen_providers.add(provider)
             unavailable.append(
                 {
-                    "provider": row.get("provider"),
+                    "provider": provider,
                     "transfer_method": row.get("transfer_method"),
                     "status": row.get("status"),
                     "notes": row.get("notes"),
                 }
             )
+
+    for provider in sorted(ADMIN_ONLY_PROVIDERS):
+        if provider in seen_providers:
+            continue
+        unavailable.append(
+            {
+                "provider": provider,
+                "status": "unavailable",
+                "error_message": "No public AUD→NPR guest quote (login/partner API required)",
+            }
+        )
+
     return {
         "errors": errors,
         "unavailable": unavailable,
@@ -391,6 +422,21 @@ def build_admin_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
         "snapshot_age_seconds": payload.get("snapshot_age_seconds"),
         "refresh_kind": payload.get("refresh_kind"),
     }
+
+
+def sanitize_all_rates_for_public(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """all_rates without error/zero/mid-market rows (for latest_rates consumers)."""
+    cleaned: list[dict[str, Any]] = []
+    for record in payload.get("all_rates", []):
+        provider = str(record.get("provider") or "")
+        if provider in EXCLUDED_PUBLIC_PROVIDERS or provider in ADMIN_ONLY_PROVIDERS:
+            continue
+        if not is_valid_public_quote(record):
+            continue
+        if is_quote_expired(quote_age_seconds(record.get("timestamp"))):
+            continue
+        cleaned.append(record)
+    return cleaned
 
 
 def format_public_rate(value: Any) -> str:

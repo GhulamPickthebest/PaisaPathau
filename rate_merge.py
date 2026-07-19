@@ -44,6 +44,10 @@ def merge_rate_records(
 
     Error / zero-value rows are never kept in the merged main list when a
     previous successful quote exists for the same key.
+
+    Quotes carried forward because they were not attempted this cycle
+    (e.g. browser providers during an API-only refresh) keep their prior
+    freshness flags — they are NOT marked as fallback.
     """
     previous_ok = {
         rate_record_key(record): record
@@ -66,13 +70,15 @@ def merge_rate_records(
             merged.append(_mark_live(record))
             continue
         if key in previous_ok:
+            # Attempted this cycle but failed — true fallback.
             merged.append(_mark_fallback(previous_ok[key]))
             continue
         # No prior good quote — omit zero/error rows from the main rates list.
 
     for key, record in previous_ok.items():
         if key not in seen:
-            merged.append(_mark_fallback(record))
+            # Not attempted this cycle — preserve as-is (no false fallback).
+            merged.append(dict(record))
 
     return merged
 
@@ -105,7 +111,7 @@ def merge_transfer_rows(
 
     for key, row in previous_ok.items():
         if key not in seen:
-            merged.append(_mark_fallback(row))
+            merged.append(dict(row))
 
     return merged
 
