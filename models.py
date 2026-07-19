@@ -27,7 +27,7 @@ class RateRecord:
     net_send_amount: float = 0.0
     transfer_speed: str = ""
     delivery_method: str = ""
-    source: Literal["api", "scraper"] = "api"
+    source: str = "api"
     customer_type: str = ""
     rate_label: str = ""
     error_message: str = ""
@@ -55,7 +55,7 @@ class RateRecord:
         provider: str,
         from_currency: str,
         send_amount: float,
-        source: Literal["api", "scraper"] = "api",
+        source: str = "api",
         error_message: str = "",
     ) -> RateRecord:
         return cls(
@@ -132,6 +132,9 @@ class TransferMethodRow:
     receive_amount_new: float | None = None
     receive_amount_existing: float | None = None
     notes: str = ""
+    quoted_at: str = ""
+    is_fallback: bool = False
+    quote_freshness: str = "live"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

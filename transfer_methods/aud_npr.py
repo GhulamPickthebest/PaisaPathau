@@ -89,13 +89,22 @@ def fetch_aud_npr_transfer_methods(
 
     rows.extend(_unavailable_rows(rows, amount))
 
+    quoted_at = utc_now_iso()
+    stamped: list[TransferMethodRow] = []
+    for row in rows:
+        if row.status == "ok" and not row.quoted_at:
+            row.quoted_at = quoted_at
+            row.is_fallback = False
+            row.quote_freshness = "live"
+        stamped.append(row)
+
     return {
-        "last_updated": utc_now_iso(),
+        "last_updated": quoted_at,
         "from_currency": "AUD",
         "to_currency": "NPR",
         "send_amount": amount,
         "transfer_methods": STANDARD_TRANSFER_METHODS,
-        "rows": [row.to_dict() for row in rows],
+        "rows": [row.to_dict() for row in stamped],
         "errors": errors,
     }
 
@@ -388,22 +397,34 @@ def _fetch_instarem_rows(amount: float) -> list[TransferMethodRow]:
         max_amount = None
 
     fastest, slowest = _speeds("Instarem")
+    brand_note = (
+        "Instarem and Instarem (by Nium) are separate consumer brands on the "
+        "same Nium network; rates may match."
+    )
+    common = dict(
+        transfer_method="Bank Transfer",
+        fee=new_fee,
+        new_user_rate=new_rate,
+        existing_user_rate=existing_rate,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        fastest_speed=fastest,
+        slowest_speed=slowest,
+        send_amount=amount,
+        receive_amount_new=new_receive,
+        receive_amount_existing=existing_receive,
+    )
     return [
         TransferMethodRow(
             provider="Instarem",
-            transfer_method="Bank Transfer",
-            fee=new_fee,
-            new_user_rate=new_rate,
-            existing_user_rate=existing_rate,
-            min_amount=min_amount,
-            max_amount=max_amount,
-            fastest_speed=fastest,
-            slowest_speed=slowest,
-            send_amount=amount,
-            receive_amount_new=new_receive,
-            receive_amount_existing=existing_receive,
-            notes="Applied FX (instarem_fx_rate); existing user pays regular fee",
-        )
+            notes=f"Applied FX (instarem_fx_rate); existing user pays regular fee. {brand_note}",
+            **common,
+        ),
+        TransferMethodRow(
+            provider="Instarem (by Nium)",
+            notes=f"Same Nium API quote as Instarem. {brand_note}",
+            **common,
+        ),
     ]
 
 

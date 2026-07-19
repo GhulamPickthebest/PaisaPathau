@@ -11,9 +11,10 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from background_worker import start_snapshot_worker
 from config import settings
+from public_quotes import build_admin_diagnostics, build_public_rates_payload
 from snapshot_store import snapshot_store
 from stream_fetch import iter_cached_sse_events
-from table_view import build_rates_table_rows, render_streaming_rates_html
+from table_view import render_streaming_rates_html
 from utils import logger
 
 
@@ -83,7 +84,7 @@ def health() -> dict[str, Any]:
         status = "stale"
     else:
         status = "ok"
-    return {
+    result: dict[str, Any] = {
         "status": status,
         "snapshot_ready": payload is not None,
         "snapshot_age_seconds": age,
@@ -92,7 +93,14 @@ def health() -> dict[str, Any]:
         "refresh_kind": (payload or {}).get("refresh_kind"),
         "refresh_seconds": settings.live_api_cache_seconds,
         "browser_refresh_seconds": settings.live_api_browser_refresh_seconds,
+        "quote_stale_after_seconds": settings.quote_stale_after_seconds,
+        "quote_expire_after_seconds": settings.quote_expire_after_seconds,
     }
+    if payload:
+        result["admin"] = build_admin_diagnostics(
+            {**payload, "snapshot_age_seconds": age}
+        )
+    return result
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -131,25 +139,8 @@ def latest_rates_stream(
     )
 
 
-@app.get("/data/rates_table.json")
-def rates_table_json(
-    send_amount: float | None = Query(None, ge=1, le=1_000_000),
-    skip_browser: bool | None = Query(None),
-    fresh: bool = Query(False),
-) -> JSONResponse:
-    payload = _get_snapshot_payload()
-    table_payload = {
-        "last_updated": payload.get("last_updated"),
-        "send_amount": payload.get("send_amount"),
-        "from_currency": "AUD",
-        "to_currency": "NPR",
-        "cached": payload.get("cached", False),
-        "fetch_mode": "snapshot",
-        "snapshot_age_seconds": payload.get("snapshot_age_seconds"),
-        "snapshot_refresh_seconds": settings.live_api_cache_seconds,
-        "rows": build_rates_table_rows(payload),
-        "status": payload.get("status", "ok"),
-    }
+def _rates_table_response(payload: dict[str, Any]) -> JSONResponse:
+    table_payload = build_public_rates_payload(payload)
     return JSONResponse(
         table_payload,
         headers={
@@ -159,6 +150,17 @@ def rates_table_json(
     )
 
 
+@app.get("/data/rates_table.json")
+@app.get("/data/rates-table.json")
+def rates_table_json(
+    send_amount: float | None = Query(None, ge=1, le=1_000_000),
+    skip_browser: bool | None = Query(None),
+    fresh: bool = Query(False),
+) -> JSONResponse:
+    """Clean public table: valid, deduplicated, freshness-aware rows only."""
+    return _rates_table_response(_get_snapshot_payload())
+
+
 @app.get("/data/latest_rates.json")
 def latest_rates(
     send_amount: float | None = Query(None, ge=1, le=1_000_000),
@@ -166,8 +168,27 @@ def latest_rates(
     fresh: bool = Query(False, description="Ignored — API always serves stored snapshot"),
 ) -> JSONResponse:
     payload = _get_snapshot_payload()
+    # Full snapshot for debugging, plus the consumer-ready public table.
+    enriched = dict(payload)
+    enriched["public_table"] = build_public_rates_payload(payload)
+    enriched["admin"] = build_admin_diagnostics(payload)
     return JSONResponse(
-        payload,
+        enriched,
+        headers={
+            "Cache-Control": f"public, max-age={settings.live_api_cache_seconds}",
+            "X-Fetch-Mode": "snapshot",
+        },
+    )
+
+
+@app.get("/data/admin_status.json")
+def admin_status(
+    send_amount: float | None = Query(None, ge=1, le=1_000_000),
+) -> JSONResponse:
+    """Errors and unavailable providers — not for the public website table."""
+    payload = _get_snapshot_payload()
+    return JSONResponse(
+        build_admin_diagnostics(payload),
         headers={
             "Cache-Control": f"public, max-age={settings.live_api_cache_seconds}",
             "X-Fetch-Mode": "snapshot",

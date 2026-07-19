@@ -19,8 +19,22 @@ def test_table_row_event_skips_unavailable():
 def test_build_rates_table_rows_excludes_error_providers():
     payload = {
         "all_rates": [
-            {"provider": "Wise", "exchange_rate": 105.0, "status": "ok", "fee": 0},
-            {"provider": "MoneyGram", "exchange_rate": 0, "status": "error", "fee": 0},
+            {
+                "provider": "Wise",
+                "exchange_rate": 105.0,
+                "receive_amount": 104000,
+                "status": "ok",
+                "fee": 14.0,
+                "source": "wise_v3_quotes",
+                "timestamp": "2026-07-19T01:00:00+00:00",
+            },
+            {
+                "provider": "MoneyGram",
+                "exchange_rate": 0,
+                "receive_amount": 0,
+                "status": "error",
+                "fee": 0,
+            },
         ]
     }
     rows = build_rates_table_rows(payload)

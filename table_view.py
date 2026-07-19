@@ -6,6 +6,7 @@ import html
 from typing import Any
 
 from utils import format_exchange_rate
+from public_quotes import build_public_table_rows
 
 
 def _has_valid_rate(row: dict[str, Any]) -> bool:
@@ -22,22 +23,8 @@ def _has_valid_rate(row: dict[str, Any]) -> bool:
 
 
 def build_rates_table_rows(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    """Build flat table rows — only providers with live rates."""
-    matrix = payload.get("aud_npr_transfer_methods") or {}
-    matrix_rows = [
-        row
-        for row in matrix.get("rows", [])
-        if row.get("status") == "ok" and _has_valid_rate(row)
-    ]
-    if matrix_rows:
-        return [_row_from_transfer_method(row) for row in matrix_rows]
-
-    rows: list[dict[str, Any]] = []
-    for record in payload.get("all_rates", []):
-        if record.get("status") != "ok" or not _has_valid_rate(record):
-            continue
-        rows.append(_row_from_rate_record(record))
-    return rows
+    """Build flat table rows — consumer-ready public quotes only."""
+    return build_public_table_rows(payload)
 
 
 def build_unavailable_table_rows(payload: dict[str, Any]) -> list[dict[str, Any]]:

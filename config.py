@@ -34,6 +34,8 @@ class Settings:
     live_api_cors_origins: str
     live_api_warm_cache: bool
     live_api_warm_cache_with_browser: bool
+    quote_stale_after_seconds: int
+    quote_expire_after_seconds: int
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -63,6 +65,13 @@ class Settings:
                 "LIVE_API_WARM_CACHE_WITH_BROWSER", "false"
             ).lower()
             == "true",
+            # Mark quotes stale after 1h; hide from public table after 24h.
+            quote_stale_after_seconds=int(
+                os.getenv("QUOTE_STALE_AFTER_SECONDS", "3600")
+            ),
+            quote_expire_after_seconds=int(
+                os.getenv("QUOTE_EXPIRE_AFTER_SECONDS", "86400")
+            ),
         )
 
 

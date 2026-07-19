@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from models import utc_now_iso
 from table_view import _has_valid_rate
 
 
@@ -20,15 +21,36 @@ def transfer_row_key(row: dict[str, Any]) -> tuple[str, str]:
     return (row.get("provider", ""), row.get("transfer_method", ""))
 
 
+def _mark_live(record: dict[str, Any]) -> dict[str, Any]:
+    live = dict(record)
+    live["is_fallback"] = False
+    live["quote_freshness"] = "live"
+    return live
+
+
+def _mark_fallback(record: dict[str, Any]) -> dict[str, Any]:
+    kept = dict(record)
+    kept["is_fallback"] = True
+    kept["quote_freshness"] = "fallback"
+    # Preserve original timestamp / quoted_at from the successful quote.
+    return kept
+
+
 def merge_rate_records(
     new_records: list[dict[str, Any]],
     previous_records: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Keep last successful quote when a provider fails on the next run."""
+    """Keep last successful quote when a provider fails on the next run.
+
+    Error / zero-value rows are never kept in the merged main list when a
+    previous successful quote exists for the same key.
+    """
     previous_ok = {
         rate_record_key(record): record
         for record in previous_records
         if record.get("status") == "ok"
+        and float(record.get("exchange_rate") or 0) > 0
+        and float(record.get("receive_amount") or 0) > 0
     }
     merged: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str, str]] = set()
@@ -36,17 +58,21 @@ def merge_rate_records(
     for record in new_records:
         key = rate_record_key(record)
         seen.add(key)
-        if record.get("status") == "ok":
-            merged.append(record)
+        if (
+            record.get("status") == "ok"
+            and float(record.get("exchange_rate") or 0) > 0
+            and float(record.get("receive_amount") or 0) > 0
+        ):
+            merged.append(_mark_live(record))
             continue
         if key in previous_ok:
-            merged.append(dict(previous_ok[key]))
+            merged.append(_mark_fallback(previous_ok[key]))
             continue
-        merged.append(record)
+        # No prior good quote — omit zero/error rows from the main rates list.
 
     for key, record in previous_ok.items():
         if key not in seen:
-            merged.append(record)
+            merged.append(_mark_fallback(record))
 
     return merged
 
@@ -68,15 +94,18 @@ def merge_transfer_rows(
         key = transfer_row_key(row)
         seen.add(key)
         if row.get("status") == "ok" and _has_valid_rate(row):
-            merged.append(row)
+            live = _mark_live(row)
+            if not live.get("quoted_at"):
+                live["quoted_at"] = utc_now_iso()
+            merged.append(live)
             continue
         if key in previous_ok:
-            merged.append(dict(previous_ok[key]))
+            merged.append(_mark_fallback(previous_ok[key]))
             continue
 
     for key, row in previous_ok.items():
         if key not in seen:
-            merged.append(dict(row))
+            merged.append(_mark_fallback(row))
 
     return merged
 
@@ -88,6 +117,16 @@ def merge_payloads(
 ) -> dict[str, Any]:
     if not previous_payload:
         merged = dict(new_payload)
+        matrix = dict(merged.get("aud_npr_transfer_methods") or {})
+        if matrix:
+            matrix.setdefault("last_updated", merged.get("last_updated") or utc_now_iso())
+            for row in matrix.get("rows", []):
+                if row.get("status") == "ok" and not row.get("quoted_at"):
+                    row["quoted_at"] = matrix["last_updated"]
+                if row.get("status") == "ok":
+                    row["is_fallback"] = False
+                    row["quote_freshness"] = "live"
+            merged["aud_npr_transfer_methods"] = matrix
     else:
         merged = dict(new_payload)
         merged["all_rates"] = merge_rate_records(
@@ -97,14 +136,28 @@ def merge_payloads(
         new_matrix = new_payload.get("aud_npr_transfer_methods") or {}
         prev_matrix = previous_payload.get("aud_npr_transfer_methods") or {}
         if new_matrix or prev_matrix:
-            merged["aud_npr_transfer_methods"] = {
+            # New matrix metadata wins (including last_updated).
+            matrix = {
+                **prev_matrix,
                 **new_matrix,
-                **{k: v for k, v in prev_matrix.items() if k != "rows"},
                 "rows": merge_transfer_rows(
                     new_matrix.get("rows", []),
                     prev_matrix.get("rows", []),
                 ),
             }
+            if new_matrix.get("rows"):
+                matrix["last_updated"] = (
+                    new_matrix.get("last_updated")
+                    or merged.get("last_updated")
+                    or utc_now_iso()
+                )
+            elif not matrix.get("last_updated"):
+                matrix["last_updated"] = (
+                    prev_matrix.get("last_updated")
+                    or merged.get("last_updated")
+                    or utc_now_iso()
+                )
+            merged["aud_npr_transfer_methods"] = matrix
 
     merged["fetch_mode"] = "snapshot"
     merged["cached"] = True

@@ -7,21 +7,33 @@ Live URL: https://paisapathau-production.up.railway.app
 1. A background worker fetches live quotes from each money transfer provider (some via API, some via browser automation).
 2. Results are saved to a snapshot. The API only reads that snapshot — visitors never trigger a scrape.
 3. API providers refresh every **60 seconds**. Browser providers refresh every **5 minutes** on a separate worker (so a hung browser cannot freeze rates).
-4. If a provider fails on one run, we keep the last successful rate.
-5. The homepage (`/`) loads the snapshot instantly. Unavailable providers are hidden.
+4. If a provider fails on one run, we keep the last successful rate with `is_fallback=true` and the original quote timestamp.
+5. The homepage (`/`) and **`/data/rates-table.json`** load only valid, deduplicated public rows. Unavailable providers are hidden.
 
 ## 2. API endpoints
 
 | URL | Use |
 |-----|-----|
-| `/` | HTML table (from snapshot) |
+| `/` | HTML table (public rows only) |
+| `/data/rates-table.json` | **Preferred** clean public table for the website |
+| `/data/rates_table.json` | Same as rates-table.json (underscore alias) |
 | `/data/latest_rates/stream` | Streaming data for custom frontend (SSE) |
-| `/data/rates_table.json` | Flat table JSON |
-| `/data/latest_rates.json` | Full JSON with all fields |
+| `/data/latest_rates.json` | Full snapshot + `public_table` + `admin` diagnostics |
 | `/data/aud_npr_transfer_methods.json` | Per payment method breakdown |
-| `/health` | Server health check |
+| `/data/admin_status.json` | Errors / unavailable providers (not for public UI) |
+| `/health` | Health check + nested `admin` diagnostics |
 
 Query params: `send_amount=1000`, `skip_browser=true` (faster, fewer providers). `fresh=true` is ignored (API always serves the stored snapshot).
+
+### Public table rules (`rates-table.json`)
+
+- Only `status=ok` with **exchange rate > 0** and **receive amount > 0**
+- Temporary failures keep the last good quote (`is_fallback=true`, original `quoted_at`)
+- Quotes older than 24h are excluded; quotes older than 1h are marked `is_stale=true`
+- **Wise**: one fee-inclusive gateway v3 checkout quote (mid-market reference excluded)
+- **Instarem** and **Instarem (by Nium)**: intentionally separate consumer brands on the same Nium network (`brand_note` explains this)
+- Rows sorted by **receive_amount** descending (best for recipient ranking)
+- Error/zero rows (MoneyGram, ACE, LuLu, Revolut, Remitly 429, etc.) appear only under `/health` → `admin` or `/data/admin_status.json`
 
 ## 3. Data fields (for WordPress / frontend)
 
@@ -79,7 +91,7 @@ One row per provider + payment method:
 - How we fetch: Wise gateway v3 quotes API (same as wise.com calculator)
 - Payment methods: Bank transfer only
 - New / existing: No split
-- Show on frontend: One rate, one fee, bank transfer
+- Show on frontend: One fee-inclusive rate (canonical). Mid-market reference is stored separately as `Wise (mid-market)` and excluded from the public table.
 - Limitation: No card vs bank breakdown from our API
 
 **Remitly**
@@ -87,7 +99,7 @@ One row per provider + payment method:
 - How we fetch: Remitly calculator API
 - Payment methods: Bank, cash pickup, mobile (direct to phone)
 - New / existing: Yes, separate rates
-- Show on frontend: Two rates per method where different (new user / existing user)
+- Show on frontend: Two rates per method where different (new user / existing user). On 429, last successful quote is kept with `is_fallback=true`.
 
 **WorldRemit**
 - Status: Live
@@ -105,10 +117,10 @@ One row per provider + payment method:
 
 **Instarem (by Nium)**
 - Status: Live
-- How we fetch: Same API as Instarem
+- How we fetch: Same API as Instarem (intentional separate consumer brand on the Nium network)
 - Payment methods: Bank transfer only
 - New / existing: Same as Instarem
-- Show on frontend: Same as Instarem (separate brand row)
+- Show on frontend: Separate brand row with `brand_note` explaining shared Nium rates
 
 **Western Union**
 - Status: Live

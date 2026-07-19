@@ -12,7 +12,8 @@ from utils import logger, retry
 
 
 class WiseScraper(BaseApiScraper):
-    provider_name = "Wise"
+    # Mid-market reference only — not the public checkout quote (see WiseTransferScraper).
+    provider_name = "Wise (mid-market)"
     BASE_URL = "https://wise.com/rates/live"
 
     @retry(exceptions=(requests.RequestException, ValueError, KeyError))

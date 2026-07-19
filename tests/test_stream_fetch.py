@@ -15,28 +15,34 @@ def test_encode_sse_format():
 def test_iter_cached_sse_events_replays_rows():
     payload = {
         "send_amount": 1000,
-        "last_updated": "2026-06-29T00:00:00+00:00",
+        "last_updated": "2026-07-19T01:00:00+00:00",
         "all_rates": [
             {
                 "provider": "Wise",
                 "exchange_rate": 105.272,
+                "receive_amount": 104000,
                 "delivery_method": "Bank Transfer",
-                "fee": 0,
+                "fee": 14.0,
                 "status": "ok",
+                "source": "wise_v3_quotes",
+                "timestamp": "2026-07-19T01:00:00+00:00",
             }
         ],
         "aud_npr_transfer_methods": {
+            "last_updated": "2026-07-19T01:00:00+00:00",
             "rows": [
                 {
                     "provider": "Wise",
                     "transfer_method": "Bank Transfer",
                     "new_user_rate": 105.272,
                     "existing_user_rate": 105.272,
-                    "fee": 0,
+                    "receive_amount_new": 104000,
+                    "fee": 14.0,
                     "status": "ok",
                     "notes": "",
+                    "quoted_at": "2026-07-19T01:00:00+00:00",
                 }
-            ]
+            ],
         },
     }
     events = list(iter_cached_sse_events(payload))
