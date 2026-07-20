@@ -2,6 +2,7 @@
 
 import json
 
+from models import utc_now_iso
 from stream_fetch import encode_sse, iter_cached_sse_events
 
 
@@ -13,9 +14,10 @@ def test_encode_sse_format():
 
 
 def test_iter_cached_sse_events_replays_rows():
+    now = utc_now_iso()
     payload = {
         "send_amount": 1000,
-        "last_updated": "2026-07-19T01:00:00+00:00",
+        "last_updated": now,
         "all_rates": [
             {
                 "provider": "Wise",
@@ -25,11 +27,11 @@ def test_iter_cached_sse_events_replays_rows():
                 "fee": 14.0,
                 "status": "ok",
                 "source": "wise_v3_quotes",
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             }
         ],
         "aud_npr_transfer_methods": {
-            "last_updated": "2026-07-19T01:00:00+00:00",
+            "last_updated": now,
             "rows": [
                 {
                     "provider": "Wise",
@@ -40,7 +42,7 @@ def test_iter_cached_sse_events_replays_rows():
                     "fee": 14.0,
                     "status": "ok",
                     "notes": "",
-                    "quoted_at": "2026-07-19T01:00:00+00:00",
+                    "quoted_at": now,
                 }
             ],
         },

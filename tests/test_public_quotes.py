@@ -1,11 +1,13 @@
 """Tests for consumer-ready public quotes table."""
 
+from models import utc_now_iso
 from public_quotes import build_public_table_rows, is_valid_public_quote
 
 
 def test_public_table_excludes_errors_and_zero_quotes():
+    now = utc_now_iso()
     payload = {
-        "last_updated": "2026-07-19T01:00:00+00:00",
+        "last_updated": now,
         "all_rates": [
             {
                 "provider": "Wise",
@@ -15,21 +17,21 @@ def test_public_table_excludes_errors_and_zero_quotes():
                 "fee": 14.33,
                 "source": "wise_v3_quotes",
                 "delivery_method": "Bank transfer",
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             },
             {
                 "provider": "MoneyGram",
                 "status": "error",
                 "exchange_rate": 0,
                 "receive_amount": 0,
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             },
             {
                 "provider": "Remitly",
                 "status": "error",
                 "exchange_rate": 0,
                 "receive_amount": 0,
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             },
         ],
     }
@@ -40,6 +42,7 @@ def test_public_table_excludes_errors_and_zero_quotes():
 
 
 def test_public_table_prefers_fee_inclusive_wise():
+    now = utc_now_iso()
     payload = {
         "all_rates": [
             {
@@ -49,7 +52,7 @@ def test_public_table_prefers_fee_inclusive_wise():
                 "receive_amount": 107500,
                 "fee": 0,
                 "source": "api",
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             },
             {
                 "provider": "Wise",
@@ -59,7 +62,7 @@ def test_public_table_prefers_fee_inclusive_wise():
                 "fee": 14.33,
                 "source": "wise_v3_quotes",
                 "delivery_method": "Bank transfer",
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             },
         ]
     }
@@ -70,6 +73,7 @@ def test_public_table_prefers_fee_inclusive_wise():
 
 
 def test_public_table_marks_fallback_and_keeps_timestamp():
+    now = utc_now_iso()
     payload = {
         "all_rates": [
             {
@@ -79,7 +83,7 @@ def test_public_table_marks_fallback_and_keeps_timestamp():
                 "receive_amount": 105000,
                 "fee": 0,
                 "delivery_method": "Bank deposit",
-                "timestamp": "2026-07-19T00:30:00+00:00",
+                "timestamp": now,
                 "is_fallback": True,
                 "quote_freshness": "fallback",
             }
@@ -89,7 +93,7 @@ def test_public_table_marks_fallback_and_keeps_timestamp():
     assert len(rows) == 1
     assert rows[0]["is_fallback"] is True
     assert rows[0]["quote_freshness"] == "fallback"
-    assert rows[0]["quoted_at"] == "2026-07-19T00:30:00+00:00"
+    assert rows[0]["quoted_at"] == now
 
 
 def test_public_table_excludes_expired_quotes():

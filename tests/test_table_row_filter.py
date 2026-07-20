@@ -1,5 +1,6 @@
 """Tests for table row visibility filtering."""
 
+from models import utc_now_iso
 from stream_fetch import _table_row_event
 from table_view import _has_valid_rate, build_rates_table_rows
 
@@ -17,6 +18,7 @@ def test_table_row_event_skips_unavailable():
 
 
 def test_build_rates_table_rows_excludes_error_providers():
+    now = utc_now_iso()
     payload = {
         "all_rates": [
             {
@@ -26,7 +28,7 @@ def test_build_rates_table_rows_excludes_error_providers():
                 "status": "ok",
                 "fee": 14.0,
                 "source": "wise_v3_quotes",
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             },
             {
                 "provider": "MoneyGram",

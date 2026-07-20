@@ -1,9 +1,11 @@
 """Tests for HTML table view helpers."""
 
+from models import utc_now_iso
 from table_view import build_rates_table_rows, render_rates_html
 
 
 def test_build_rates_table_rows_from_all_rates():
+    now = utc_now_iso()
     payload = {
         "all_rates": [
             {
@@ -16,7 +18,7 @@ def test_build_rates_table_rows_from_all_rates():
                 "transfer_speed": "Same day",
                 "status": "ok",
                 "source": "wise_v3_quotes",
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             }
         ]
     }
@@ -30,6 +32,7 @@ def test_build_rates_table_rows_from_all_rates():
 
 
 def test_build_rates_table_rows_prefers_transfer_matrix():
+    now = utc_now_iso()
     payload = {
         "all_rates": [
             {
@@ -37,11 +40,11 @@ def test_build_rates_table_rows_prefers_transfer_matrix():
                 "status": "ok",
                 "exchange_rate": 1,
                 "receive_amount": 1,
-                "timestamp": "2026-07-19T01:00:00+00:00",
+                "timestamp": now,
             }
         ],
         "aud_npr_transfer_methods": {
-            "last_updated": "2026-07-19T01:00:00+00:00",
+            "last_updated": now,
             "rows": [
                 {
                     "provider": "Wise",
@@ -52,7 +55,7 @@ def test_build_rates_table_rows_prefers_transfer_matrix():
                     "fee": 3.0,
                     "notes": "Public quote",
                     "status": "ok",
-                    "quoted_at": "2026-07-19T01:00:00+00:00",
+                    "quoted_at": now,
                 }
             ],
         },
@@ -64,10 +67,11 @@ def test_build_rates_table_rows_prefers_transfer_matrix():
 
 
 def test_render_rates_html_includes_table_headers():
+    now = utc_now_iso()
     html = render_rates_html(
         {
             "send_amount": 1000,
-            "last_updated": "2026-06-29T00:00:00+00:00",
+            "last_updated": now,
             "all_rates": [
                 {
                     "provider": "Wise",
@@ -77,7 +81,7 @@ def test_render_rates_html_includes_table_headers():
                     "fee": 14.0,
                     "status": "ok",
                     "source": "wise_v3_quotes",
-                    "timestamp": "2026-07-19T01:00:00+00:00",
+                    "timestamp": now,
                 }
             ],
         }
