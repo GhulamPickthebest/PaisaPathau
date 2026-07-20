@@ -486,7 +486,7 @@ def _fetch_western_union_comparison_rows(amount: float) -> list[TransferMethodRo
             send_amount=amount,
             receive_amount_new=receive,
             receive_amount_existing=receive,
-            notes="Wise comparisons quote; enable skip_browser=false for per-method data",
+            notes="Wise comparisons API bank-transfer quote only. Cash/other methods are not returned by the current production API.",
         )
     ]
 

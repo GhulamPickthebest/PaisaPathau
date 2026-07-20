@@ -173,25 +173,23 @@ The API returns the same JSON shape previously written to `data/latest_rates.jso
 
 | Provider | Status |
 |----------|--------|
-| **Wise** | Live — public transfer quote API |
-| **Remitly** | Live — calculator API; new + existing user rates |
+| **Wise** | Live — gateway v3 fee-inclusive checkout quote (public table) |
+| **Remitly** | Live — calculator API; new + existing; 429 → last-good fallback |
 | **WorldRemit** | Live — GraphQL API |
 | **Instarem** | Live — applied FX (`instarem_fx_rate`) |
-| **Instarem (by Nium)** | Live — same Nium API as Instarem |
-| **Western Union** | Live — Wise comparisons API (headline rate); per-method + new/existing rates with browser |
-| **Xe Money Transfer** | Live with browser; skipped on Railway default |
+| **Instarem (by Nium)** | Live — same Nium API; separate consumer brand label |
+| **Western Union** | Live — Wise comparisons **bank transfer only** (cash not in current API) |
+| **Xe Money Transfer** | Live with browser (may be marked stale between cycles) |
 | **Xoom (PayPal)** | Live — Wise comparisons API (aggregated quote) |
-| **Ria Money Transfer** | Live — Playwright + `MoneyTransferCalculator/Calculate` |
-| **Taptap Send** | Live — Playwright `api.taptapsend.com/api/fxRates` |
-| **Skrill** | Live — Playwright calculator (AU→Nepal country select) |
+| **Ria Money Transfer** | Live — Playwright + calculator API |
+| **Taptap Send** | Live — Playwright FX API |
+| **Skrill** | Configured (Playwright) but often **missing** from public rows — see `admin.unavailable` |
 | **MoneyGram** | Unavailable — fee-quote API returns 401/captcha (partner API only) |
 | **Revolut** | Unavailable — no AUD→NPR on public web/API |
 | **ACE Money Transfer** | Unavailable — calculator needs login; no guest rate |
 | **LuLu Exchange** | Unavailable — rates only in LuLu Money app |
 
-Unavailable providers still appear in API output with `"status": "error"` so the frontend can show them.
-
-More send currencies can be added later via `ACTIVE_SEND_CURRENCIES` in `constants.py`.
+Public consumers should use `/data/rates-table.json`. Errors / missing brands appear under `/data/admin_status.json`, not in the public table.
 
 ### New vs existing user rates
 
@@ -211,14 +209,16 @@ Filter in WordPress by `rate_label` or `customer_type`. Providers without a spli
 | Remitly | Yes | Yes | Yes (Direct to phone) | Yes (dual API: `strict_promo`) | Fully covered via public calculator API |
 | WorldRemit | Yes | Yes | Yes (MOB / Khalti wallet alias) | Yes (`crossedOutValue` when present) | Fully covered via GraphQL |
 | Instarem | Yes | — | — | Same FX, different fees | Public API only exposes bank transfer for NPR |
-| Wise | Yes | — | — | No split on public endpoint | Comparison API returns bank quote only |
-| Western Union | Yes | Yes | Not offered online for NPR | Bank: promo ratio from landing page; Cash: same FX, higher fee | Per-method needs Playwright send-flow (no public REST API); mobile not in payout list |
+| Wise | Yes | — | — | No split on public endpoint | v3 quotes returns bank checkout quote only |
+| Western Union | Yes | **No** (current API) | Not offered online for NPR | No on comparisons feed | Production uses Wise comparisons bank quote only |
+| Xoom | Yes | — | — | — | Aggregated Wise comparisons quote |
+| Xe / Ria / Taptap | Limited | Limited | Limited | — | Browser scrapers; freshness rules apply |
+| Skrill | — | — | — | — | Scraper configured; often missing from live public rows |
 | MoneyGram | — | — | — | — | Calculator API returns 403 / captcha |
-| Xoom | — | — | — | — | Requires sign-in; no guest quote |
-| Xe | — | — | — | — | Currency converter only, not send-money quotes |
-| OFX, OrbitRemit, TorFX | — | — | — | — | Cloudflare / no public quote API |
 
 Min/max send limits are mostly **not** exposed on public endpoints (Instarem min is the exception).
+
+See **`docs/CLIENT_PROJECT_GUIDE.md`** for the full client-facing field reference (`is_stale`, `is_fallback`, `canonical_rules`, etc.).
 
 ---
 

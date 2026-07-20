@@ -27,6 +27,23 @@ ADMIN_ONLY_PROVIDERS = frozenset(
     }
 )
 
+# Configured remittance brands we expect in the public comparison when healthy.
+EXPECTED_PUBLIC_PROVIDERS = frozenset(
+    {
+        "Wise",
+        "Remitly",
+        "WorldRemit",
+        "Instarem",
+        "Instarem (by Nium)",
+        "Western Union",
+        "Xoom (PayPal)",
+        "Xe Money Transfer",
+        "Ria Money Transfer",
+        "Taptap Send",
+        "Skrill",
+    }
+)
+
 INSTAREM_BRAND_NOTE = (
     "Instarem and Instarem (by Nium) are separate consumer brands on the same "
     "Nium network; rates may match."
@@ -412,6 +429,35 @@ def build_admin_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
                 "provider": provider,
                 "status": "unavailable",
                 "error_message": "No public AUD→NPR guest quote (login/partner API required)",
+            }
+        )
+
+    # Providers configured in scrapers but missing from the current public table
+    # (failed scrape, expired quote, or never succeeded).
+    present_public = {
+        str(row.get("provider") or "")
+        for row in build_public_table_rows(payload)
+    }
+    present_ok_rates = {
+        str(record.get("provider") or "")
+        for record in payload.get("all_rates", [])
+        if is_valid_public_quote(record)
+        and not is_quote_expired(quote_age_seconds(record.get("timestamp")))
+    }
+    for provider in sorted(EXPECTED_PUBLIC_PROVIDERS):
+        if provider in present_public or provider in present_ok_rates:
+            continue
+        if provider in seen_providers or provider in ADMIN_ONLY_PROVIDERS:
+            continue
+        seen_providers.add(provider)
+        unavailable.append(
+            {
+                "provider": provider,
+                "status": "missing",
+                "error_message": (
+                    "Configured scraper but no current public quote "
+                    "(failed, expired after 24h, or not yet refreshed)"
+                ),
             }
         )
 

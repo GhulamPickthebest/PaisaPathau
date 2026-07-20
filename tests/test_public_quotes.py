@@ -114,6 +114,43 @@ def test_public_table_excludes_expired_quotes():
     assert build_public_table_rows(payload) == []
 
 
+def test_admin_lists_missing_configured_providers():
+    from public_quotes import build_admin_diagnostics
+
+    payload = {
+        "last_updated": utc_now_iso(),
+        "all_rates": [
+            {
+                "provider": "Wise",
+                "status": "ok",
+                "exchange_rate": 106.0,
+                "receive_amount": 104700,
+                "fee": 14.0,
+                "source": "wise_v3_quotes",
+                "timestamp": utc_now_iso(),
+            }
+        ],
+        "aud_npr_transfer_methods": {"rows": []},
+        "errors": [],
+    }
+    admin = build_admin_diagnostics(payload)
+    missing = {
+        item["provider"]: item["status"]
+        for item in admin["unavailable"]
+        if item.get("status") == "missing"
+    }
+    assert missing.get("Skrill") == "missing"
+
+
+def test_is_valid_public_quote_requires_receive():
+    assert not is_valid_public_quote(
+        {"status": "ok", "exchange_rate": 105, "receive_amount": 0}
+    )
+    assert is_valid_public_quote(
+        {"status": "ok", "exchange_rate": 105, "receive_amount": 100}
+    )
+
+
 def test_is_valid_public_quote_requires_receive():
     assert not is_valid_public_quote(
         {"status": "ok", "exchange_rate": 105, "receive_amount": 0}
